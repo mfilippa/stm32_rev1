@@ -12,5 +12,6 @@
 #include "lib/comm.h"
 #include "lib/debug.h"
 #include "lib/fb.h"
+#include "lib/math.h"
 
 #endif // _LIBINC_H_
