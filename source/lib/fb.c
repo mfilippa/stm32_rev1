@@ -28,7 +28,7 @@ struct fb_struct {
 uint32_t fb_init(void){
 	uint32_t i;
 	// zero everything
-	for (i=0; i< FB_CHANNEL_COUNT-1; i++){
+	for (i=0; i< FB_CHANNEL_COUNT; i++){
 		fb.table[i].offset = fb.table[i].raw = fb.table[i].value = 0;
 		fb.table[i].min = fb.table[i].max = fb.table[i].out_of_range = 0;
 	}
