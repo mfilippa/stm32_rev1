@@ -67,6 +67,7 @@ int32_t math_sin(int32_t angle_q11);
 int32_t math_cos(int32_t angle_q11);
 
 // table_lookup: look up table with interpolation/extrapolation, returns value
+// NOTE: TABLE MUST BE ORDERED ASCENDING WITH RESPECT TO X
 int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, uint32_t tsize);
 
 // biquad_filter: implements a biquad filter
