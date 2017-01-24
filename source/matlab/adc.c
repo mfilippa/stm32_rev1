@@ -56,7 +56,6 @@ void adc_matlab_slow(void){
 	if (adc.slow_handler != 0){
 		adc.slow_handler();
 	}
-	pout[27]++;
 }
 
 // -----------------------------------------------------------------------------
@@ -76,7 +75,6 @@ void adc_matlab_fast(void){
 	if (adc.fast_handler != 0){
 		adc.fast_handler();
 	}
-	pout[28]++;
 }
 
 // -----------------------------------------------------------------------------
