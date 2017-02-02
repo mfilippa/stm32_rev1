@@ -5,30 +5,20 @@
 // includes
 #include "fb.h"
 
-// fb table
-typedef struct fb_table_struct {
-	int32_t raw;				// raw ADC value
-	int32_t offset;				// raw ADC offset
-	int32_t scaling;			// scaling
-	int32_t scaling_q;			// q factor for scaling
-	int32_t value;				// converted value
-	int32_t min;				// min value to check against
-	int32_t max;				// max value to check against
-	int32_t out_of_range;		// out of range flag if value exceeds max/min
-} fb_table_t;
-
 // module struct
 struct fb_struct {
-	fb_table_t table[FB_CHANNEL_COUNT];
+	fb_table_t * table;
+	uint32_t tsize;
 } fb;
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-uint32_t fb_init(void){
+uint32_t fb_init(fb_table_t * fb_table, uint32_t tsize){
 	uint32_t i;
+	if (tsize==0) return 1;
 	// zero everything
-	for (i=0; i< FB_CHANNEL_COUNT; i++){
+	for (i=0; i< fb.tsize; i++){
 		fb.table[i].offset = fb.table[i].raw = fb.table[i].value = 0;
 		fb.table[i].min = fb.table[i].max = fb.table[i].out_of_range = 0;
 	}
@@ -37,9 +27,9 @@ uint32_t fb_init(void){
 // -----------------------------------------------------------------------------
 // process
 // -----------------------------------------------------------------------------
-void fb_process(fb_channel_t channel, int32_t raw){
+void fb_process(uint32_t channel, int32_t raw){
 	int32_t temp;
-	if (channel >= FB_CHANNEL_COUNT) return;
+	if (channel >= fb.tsize) return;
 	fb.table[channel].raw = raw;
 	temp = fb.table[channel].raw - fb.table[channel].offset;
 	temp *= fb.table[channel].scaling;
@@ -50,8 +40,8 @@ void fb_process(fb_channel_t channel, int32_t raw){
 // -----------------------------------------------------------------------------
 // check
 // -----------------------------------------------------------------------------
-uint32_t fb_range_check(fb_channel_t channel){
-	if (channel >= FB_CHANNEL_COUNT) return 0;
+uint32_t fb_range_check(uint32_t channel){
+	if (channel >= fb.tsize) return 0;
 	if ((fb.table[channel].value > fb.table[channel].max) ||
 			(fb.table[channel].value < fb.table[channel].min)){
 		fb.table[channel].out_of_range = 1;
@@ -64,16 +54,16 @@ uint32_t fb_range_check(fb_channel_t channel){
 // -----------------------------------------------------------------------------
 // store offset
 // -----------------------------------------------------------------------------
-void fb_store_offset(fb_channel_t channel, uint32_t raw){
-	if (channel >= FB_CHANNEL_COUNT) return;
+void fb_store_offset(uint32_t channel, uint32_t raw){
+	if (channel >= fb.tsize) return;
 	fb.table[channel].offset = raw;
 }
 // -----------------------------------------------------------------------------
 // store offset
 // -----------------------------------------------------------------------------
-void fb_store_params(fb_channel_t channel, int32_t scaling, int32_t scaling_q,
+void fb_store_params(uint32_t channel, int32_t scaling, int32_t scaling_q,
 		int32_t min, int32_t max){
-	if (channel >= FB_CHANNEL_COUNT) return;
+	if (channel >= fb.tsize) return;
 	fb.table[channel].scaling = scaling;
 	fb.table[channel].scaling_q = scaling_q;
 	if (min < max) {
@@ -84,15 +74,15 @@ void fb_store_params(fb_channel_t channel, int32_t scaling, int32_t scaling_q,
 // -----------------------------------------------------------------------------
 // get
 // -----------------------------------------------------------------------------
-int32_t fb_get(fb_channel_t channel){
-	if (channel >= FB_CHANNEL_COUNT) return 0;
+int32_t fb_get(uint32_t channel){
+	if (channel >= fb.tsize) return 0;
 	return fb.table[channel].value;
 }
 
 // -----------------------------------------------------------------------------
 // get raw
 // -----------------------------------------------------------------------------
-uint32_t fb_get_raw(fb_channel_t channel){
-	if (channel >= FB_CHANNEL_COUNT) return 0;
+uint32_t fb_get_raw(uint32_t channel){
+	if (channel >= fb.tsize) return 0;
 	return fb.table[channel].raw;
 }

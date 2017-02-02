@@ -17,4 +17,10 @@ void app_background(void);
 // systick: to be executed at system timer tick event
 void app_systick(void);
 
+// slow adc processing
+void app_adc_process_slow(void);
+
+// fast adc processing
+void app_adc_process_fast(void);
+
 #endif // _APP_H_

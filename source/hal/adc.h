@@ -8,47 +8,44 @@
 // system includes
 #include <stdint.h>
 
-// fast adc channel enumerations
-typedef enum  adc_fast_enum {
-	ADC_FAST_CH1 = 0,
-	ADC_FAST_CH2,
-	ADC_FAST_CH3,
-	ADC_FAST_CH4,
-	ADC_FAST_CH5,
-	ADC_FAST_CH6,
-	ADC_FAST_CH7,
-	ADC_FAST_CH8,
-	ADC_FAST_COUNT,
-} adc_fast_t;
+// ADC channels
+typedef enum adc_channels_enum {
+	// fast channels
+	ADC_CH_FAST1,
+	ADC_CH_FAST2,
+	ADC_CH_FAST3,
+	ADC_CH_FAST4,
+	ADC_CH_FAST5,
+	ADC_CH_FAST6,
+	ADC_CH_FAST7,
+	ADC_CH_FAST8,
+	ADC_CH_FAST9,
+	ADC_CH_FAST10,
+	// slow channels
+	ADC_CH_SLOW1,
+	ADC_CH_SLOW2,
+	ADC_CH_SLOW3,
+	ADC_CH_SLOW4,
+	ADC_CH_SLOW5,
+	ADC_CH_SLOW6,
+	ADC_CH_SLOW7,
+	ADC_CH_SLOW8,
+	ADC_CH_COUNT,
+} adc_channel_t;
 
-// slow adc channel enumerations
-typedef enum  adc_slowch_enum {
-	ADC_SLOW_CH1 = 0,
-	ADC_SLOW_CH2,
-	ADC_SLOW_CH3,
-	ADC_SLOW_CH4,
-//	ADC_SLOW_CH5,
-//	ADC_SLOW_CH6,
-//	ADC_SLOW_CH7,
-//	ADC_SLOW_CH8,
-	ADC_SLOW_COUNT,
-} adc_slow_t;
 
 // init: intializes the module, return 0 if successful
 // pass function pointers if interrupts are to be generated after
 // a group conversion, or ZERO to disable that interrupt
 uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void));
 
-// read_fast: reads the ADC value from the fast group
-uint32_t adc_read_fast(adc_fast_t channel);
+// force an ADC trigger, fast group
+void adc_sw_trigger_fast(void);
 
-// read_slow: reads the ADC value from the slow group
-uint32_t adc_read_slow(adc_slow_t channel);
+// force an ADC trigger, slow group
+void adc_sw_trigger_slow(void);
 
-// trigger_slow: force an ADC trigger on slow group
-void adc_trigger_slow(void);
-
-// trigger_fast: force an ADC trigger on fast group
-void adc_trigger_fast(void);
+// reads the ADC value
+uint32_t adc_read(adc_channel_t channel);
 
 #endif // _ADC_H_
