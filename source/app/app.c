@@ -11,6 +11,22 @@
 #define APP_COMM_BUFFER_SIZE	1024
 #define APP_DEBUG_BUFFER_SIZE	1024
 
+// ADC configuration
+adc_config_t adc_config = {
+	// fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
+	{ { 0, 1, 2, 3 }, { 0, 1, 2, 0 }, { 0, 1, 2, 0 } },
+	// fast count: zero to disable, [0] count > [1-2] count
+	{ 4, 3, 3 },
+	// trigger: 1 for pwm, 0 for sw
+	0,
+	// slow channel sequence: 0-15
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	// slow channel count, zero to disable
+	8,
+	// trigger: 1 for pwm, 0 for sw
+	0,
+};
+
 // module structure
 struct app_struct {
 	// comm buffers
@@ -38,7 +54,7 @@ uint32_t app_init(void) {
 		return 1;
 	if (uart_init(115200) != 0)
 		return 1;
-	if (adc_init(&app_adc_process_slow, &app_adc_process_fast)
+	if (adc_init(&adc_config, &app_adc_process_slow, &app_adc_process_fast)
 			!= 0)
 		return 1;
 //	if (pwm_init(0) != 0)
@@ -203,7 +219,7 @@ void app_comm_handler(uint32_t rx_size) {
 	case 0xD2:
 		// raw ADC data
 		for (temp = 0; temp < (ADC_CH_COUNT); temp++) {
-			comm_write16(adc_read((adc_channel_t)temp));
+			comm_write16(adc_read((uint32_t)temp));
 		}
 		break;
 	case 0xD3:

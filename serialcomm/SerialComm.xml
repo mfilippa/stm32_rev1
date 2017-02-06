@@ -29,16 +29,16 @@
 	<item type="separator"/>
  </tabcontrol> 
  <tabcontrol tabname="Raw ADC" query="D2">
- <item type="parsecontrol" name="ADC FAST CH1:" returntype="double" search="D2" offset=" 2" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH2:" returntype="double" search="D2" offset=" 6" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH3:" returntype="double" search="D2" offset="10" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH4:" returntype="double" search="D2" offset="14" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH5:" returntype="double" search="D2" offset="18" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH6:" returntype="double" search="D2" offset="22" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH7:" returntype="double" search="D2" offset="26" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH8:" returntype="double" search="D2" offset="30" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH9:" returntype="double" search="D2" offset="34" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="ADC FAST CH10:" returntype="double" search="D2" offset="38" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC1 FAST CH1:" returntype="double" search="D2" offset=" 2" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC1 FAST CH2:" returntype="double" search="D2" offset=" 6" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC1 FAST CH3:" returntype="double" search="D2" offset="10" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC1 FAST CH4:" returntype="double" search="D2" offset="14" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC2 FAST CH1:" returntype="double" search="D2" offset="18" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC2 FAST CH2:" returntype="double" search="D2" offset="22" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC2 FAST CH3:" returntype="double" search="D2" offset="26" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC3 FAST CH1:" returntype="double" search="D2" offset="30" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC3 FAST CH2:" returntype="double" search="D2" offset="34" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="ADC3 FAST CH3:" returntype="double" search="D2" offset="38" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
  <item type="parsecontrol" name="ADC SLOW CH1:" returntype="double" search="D2" offset="42" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
  <item type="parsecontrol" name="ADC SLOW CH2:" returntype="double" search="D2" offset="46" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
  <item type="parsecontrol" name="ADC SLOW CH3:" returntype="double" search="D2" offset="50" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />

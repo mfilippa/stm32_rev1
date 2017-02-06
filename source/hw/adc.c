@@ -6,116 +6,35 @@
 #include "stm32f4xx.h"
 #include "hal/adc.h"
 
-// -----------------------------------------------------------------------------
-// configuration
-// -----------------------------------------------------------------------------
-
-// ADC fast counts
-#define ADC1_FAST_COUNT		4	// zero to disable, 1 to 4
-#define ADC2_FAST_COUNT		3	// must be < ADC1_FAST_COUNT, zero to disable
-#define ADC3_FAST_COUNT		3	// must be < ADC1_FAST_COUNT, zero to disable
-#define ADC_FAST_COUNT	(ADC1_FAST_COUNT+ADC2_FAST_COUNT+ADC3_FAST_COUNT)
-
-// ADC1 fast sequence (ADC channel n)
-#define ADC1_FAST_CH1	0
-#define ADC1_FAST_CH2	1
-#define ADC1_FAST_CH3	2
-#define ADC1_FAST_CH4	3
-
-// ADC2 fast sequence (ADC channel n)
-#define ADC2_FAST_CH1	4
-#define ADC2_FAST_CH2	5
-#define ADC2_FAST_CH3	6
-
-// ADC3 fast sequence (ADC channel n)
-#define ADC3_FAST_CH1	7
-#define ADC3_FAST_CH2	8
-#define ADC3_FAST_CH3	9
-
-// ADC FAST TRIGGER - 1 for PWM, 0 for SW
-#define ADC_FAST_PWM_TRIGGER   0
-
-// ADC slow count
-#define ADC_SLOW_COUNT	8	// zero to disable, 1 to 8
-
-// ADC slow sequence
-#define ADC_SLOW_CH1	0
-#define ADC_SLOW_CH2	1
-#define ADC_SLOW_CH3	2
-#define ADC_SLOW_CH4	3
-#define ADC_SLOW_CH5	4
-#define ADC_SLOW_CH6	5
-#define ADC_SLOW_CH7	6
-#define ADC_SLOW_CH8	7
-
-// ADC SLOW TRIGGER - 1 for PWM, 0 for SW
-#define ADC_SLOW_PWM_TRIGGER  0
-
-// -----------------------------------------------------------------------------
-// end of configuration
-// -----------------------------------------------------------------------------
-
 // defines
 #define ADC_MAX_FAST_COUNT	4	// for each ADC(1-3)
 #define ADC_MAX_SLOW_COUNT	8	// total ADC1
 #define ADC_NR_CONVERTERS	3	// ADC1-3
 
-// injected check
-#if (ADC1_FAST_COUNT!=0)
-#if ((ADC2_FAST_COUNT>=ADC1_FAST_COUNT)||(ADC3_FAST_COUNT>=ADC1_FAST_COUNT))
-#error "ADC1_FAST_COUNTmust be > than ADC2_FAST_COUNT and ADC3_FAST_COUNT"
-#endif
-#endif
+// ADC sample time
+#define ADC_SAMPLE_TIME		ADC_SampleTime_84Cycles
 
-// ADC configuration table
-typedef struct adc_config_struct {
-	uint32_t fast_channel[ADC_NR_CONVERTERS][ADC_MAX_FAST_COUNT];
-	uint32_t fast_count[ADC_NR_CONVERTERS];
-	uint32_t fast_pwm_trigger;
-	uint32_t slow_channel[ADC_MAX_SLOW_COUNT];
+// module structure
+struct adc_struct {
+	// adc configuration
+	adc_config_t * config;
+	// handlers
+	void (*slow_handler)(void);
+	void (*fast_handler)(void);
+	// raw data storage
+	uint32_t raw[3*ADC_MAX_FAST_COUNT+ADC_MAX_SLOW_COUNT];
+	// counts
+	uint32_t fast_count;
 	uint32_t slow_count;
-	uint32_t slow_pwm_trigger;
-} adc_config_t;
-
-// example config:
-//adc_config_t adc_config = {
-//	{ { 0, 1, 2, 3 },	// ADC1 fast sequence
-//	{ 4, 5, 6, 0 },		// ADC2 fast sequence
-//	{ 7, 8, 9, 0 } },	// ADC3 fast sequence
-//	{ 4, 3, 3 },		// ADC fast lengths (ADC1>ADC2, ADC1>ADC3, zero to disable)
-//	1,					// 1 for PWM trigger, 0 for SW trigger
-//	{ 0, 1, 2, 3, 4, 5, 0, 0 },	// ADC1 slow sequence
-//	6, 					// ADC slow length, zero to disable
-//	0, 					// 1 for PWM trigger, 0 for SW trigger
-//};
-
-// ADC configuration
-adc_config_t adc_config = {
-// ADC1 fast sequence
-		{ { ADC1_FAST_CH1, ADC1_FAST_CH2, ADC1_FAST_CH3,
-		ADC1_FAST_CH4 },
-		// ADC2 fast sequence
-		{ ADC2_FAST_CH1, ADC2_FAST_CH2, ADC2_FAST_CH3, 0 },
-		// ADC3 fast sequence
-		{ ADC3_FAST_CH1, ADC3_FAST_CH2, ADC3_FAST_CH3, 0 } },
-		// ADC fast lengths (ADC1>ADC2, ADC1>ADC3, zero to disable)
-		{ ADC1_FAST_COUNT, ADC2_FAST_COUNT, ADC3_FAST_COUNT },
-		// 1 for PWM trigger, 0 for SW trigger
-		ADC_FAST_PWM_TRIGGER,
-		// ADC1 slow sequence
-		{ ADC_SLOW_CH1, ADC_SLOW_CH2, ADC_SLOW_CH3, ADC_SLOW_CH4, ADC_SLOW_CH5,
-		ADC_SLOW_CH6, ADC_SLOW_CH7, ADC_SLOW_CH8 },
-		// ADC slow length, zero to disable
-		ADC_SLOW_COUNT,
-		// 1 for PWM trigger, 0 for SW trigger
-		ADC_SLOW_PWM_TRIGGER,
-};
+	uint32_t count;
+} adc;
 
 // hardware pin mapping
 struct adc_pin_struct {
 	GPIO_TypeDef * gpio;
 	uint32_t pin;
-} adc_map[16] = { { GPIOA, GPIO_Pin_0 }, // ADC_Channel_0  (ADC123)
+} adc_map[16] = {
+		{ GPIOA, GPIO_Pin_0 }, // ADC_Channel_0  (ADC123)
 		{ GPIOA, GPIO_Pin_1 }, // ADC_Channel_1  (ADC123)
 		{ GPIOA, GPIO_Pin_2 }, // ADC_Channel_2  (ADC123)
 		{ GPIOA, GPIO_Pin_3 }, // ADC_Channel_3  (ADC123)
@@ -131,22 +50,13 @@ struct adc_pin_struct {
 		{ GPIOC, GPIO_Pin_3 }, // ADC_Channel_13 (ADC123)
 		{ GPIOC, GPIO_Pin_4 }, // ADC_Channel_14 (ADC12 )
 		{ GPIOC, GPIO_Pin_5 }, // ADC_Channel_15 (ADC12 )
-		};
+};
 
-// ADC sample time
-#define ADC_SAMPLE_TIME		ADC_SampleTime_15Cycles
-
-// module structure
-struct adc_struct {
-	uint32_t raw[ADC_FAST_COUNT+ADC_SLOW_COUNT]; // maximize storage
-	void (*slow_handler)(void);
-	void (*fast_handler)(void);
-} adc;
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
+uint32_t adc_init(adc_config_t * config, void (*slow_handler)(void), void (*fast_handler)(void)) {
 
 	GPIO_InitTypeDef GPIO_InitStruct;
 	DMA_InitTypeDef DMA_InitStruct;
@@ -157,6 +67,33 @@ uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
 	// store data
 	adc.slow_handler = slow_handler;
 	adc.fast_handler = fast_handler;
+	adc.config = config;
+
+	// range checks
+	if (adc.config->fast_count[0]>4) return 1;
+	if (adc.config->fast_count[0]!=0){
+		if (adc.config->fast_count[1]>=adc.config->fast_count[0]) return 1;
+		if (adc.config->fast_count[2]>=adc.config->fast_count[0]) return 1;
+	}
+	if (adc.config->slow_count>8) return 1;
+	for (i=0;i<ADC_MAX_FAST_COUNT;i++){
+		if (adc.config->fast_channel[0][i] >15) return 1;
+	}
+	for (i=0;i<ADC_MAX_FAST_COUNT;i++){
+		if (adc.config->fast_channel[1][i] >15) return 1;
+	}
+	for (i=0;i<ADC_MAX_FAST_COUNT;i++){
+		if (adc.config->fast_channel[2][i] >15) return 1;
+	}
+	for (i=0;i<ADC_MAX_SLOW_COUNT;i++){
+		if (adc.config->slow_channel[i] >15) return 1;
+	}
+
+	// counts
+	adc.fast_count = adc.config->fast_count[0]+adc.config->fast_count[1]+adc.config->fast_count[2];
+	adc.slow_count = adc.config->slow_count;
+	adc.count = adc.fast_count+adc.slow_count;
+
 
 	// enable all required peripheral clocks
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
@@ -168,49 +105,46 @@ uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 
 	// FAST PIN CONFIG
-	if (adc_config.fast_count[0] != 0) {
+	if (adc.config->fast_count[0] != 0) {
 
 		// init gpio ...
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
 		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
 		// ... ADC1
-		for (i = 0; i < adc_config.fast_count[0]; i++) {
-			GPIO_InitStruct.GPIO_Pin = adc_map[adc_config.fast_channel[0][i]].pin;
-			GPIO_Init(adc_map[adc_config.fast_channel[0][i]].gpio,
-					&GPIO_InitStruct);
+		for (i = 0; i < adc.config->fast_count[0]; i++) {
+			GPIO_InitStruct.GPIO_Pin = adc_map[adc.config->fast_channel[0][i]].pin;
+			GPIO_Init(adc_map[adc.config->fast_channel[0][i]].gpio, &GPIO_InitStruct);
 		}
 		// ... ADC2
-		for (i = 0; i < adc_config.fast_count[1]; i++) {
-			GPIO_InitStruct.GPIO_Pin = adc_map[adc_config.fast_channel[1][i]].pin;
-			GPIO_Init(adc_map[adc_config.fast_channel[1][i]].gpio,
-					&GPIO_InitStruct);
+		for (i = 0; i < adc.config->fast_count[1]; i++) {
+			GPIO_InitStruct.GPIO_Pin = adc_map[adc.config->fast_channel[1][i]].pin;
+			GPIO_Init(adc_map[adc.config->fast_channel[1][i]].gpio, &GPIO_InitStruct);
 		}
 		// ... ADC3
-		for (i = 0; i < adc_config.fast_count[2]; i++) {
-			GPIO_InitStruct.GPIO_Pin = adc_map[adc_config.fast_channel[2][i]].pin;
-			GPIO_Init(adc_map[adc_config.fast_channel[2][i]].gpio,
-					&GPIO_InitStruct);
+		for (i = 0; i < adc.config->fast_count[2]; i++) {
+			GPIO_InitStruct.GPIO_Pin = adc_map[adc.config->fast_channel[2][i]].pin;
+			GPIO_Init(adc_map[adc.config->fast_channel[2][i]].gpio, &GPIO_InitStruct);
 		}
 	}
 	// END OF FAST PIN CONFIG
 
 	// SLOW PIN CONFIG
-	if (adc_config.slow_count > 0) {
+	if (adc.config->slow_count > 0) {
 
 		// init gpio ...
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
 		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
 		// ... ADC1
-		for (i = 0; i < adc_config.slow_count; i++) {
-			GPIO_InitStruct.GPIO_Pin = adc_map[adc_config.slow_channel[i]].pin;
-			GPIO_Init(adc_map[adc_config.slow_channel[i]].gpio, &GPIO_InitStruct);
+		for (i = 0; i < adc.config->slow_count; i++) {
+			GPIO_InitStruct.GPIO_Pin = adc_map[adc.config->slow_channel[i]].pin;
+			GPIO_Init(adc_map[adc.config->slow_channel[i]].gpio, &GPIO_InitStruct);
 		}
 		// DMA2 Stream0 -> ADC1
 		DMA_InitStruct.DMA_Channel = DMA_Channel_0;
 		DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t) 0x4001204C;
 		DMA_InitStruct.DMA_Memory0BaseAddr =
-				(uint32_t) &(adc.raw[ADC_FAST_COUNT]);// start at end of fast count
-		DMA_InitStruct.DMA_BufferSize = adc_config.slow_count;
+				(uint32_t) &(adc.raw[adc.fast_count]);// start at end of fast count
+		DMA_InitStruct.DMA_BufferSize = adc.config->slow_count;
 		DMA_InitStruct.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
 		DMA_InitStruct.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
 		DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;
@@ -242,10 +176,10 @@ uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
 	ADC_InitStruct.ADC_ScanConvMode = ENABLE;	// SCAN: convert 0-n channels
 	ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;
 	ADC_InitStruct.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T2_TRGO;
-	ADC_InitStruct.ADC_NbrOfConversion = adc_config.slow_count;
+	ADC_InitStruct.ADC_NbrOfConversion = adc.config->slow_count;
 	ADC_InitStruct.ADC_Resolution = ADC_Resolution_12b;
 	// ADC1 slow trigger: PWM or SW
-	if ((adc_config.slow_pwm_trigger) && (adc_config.slow_count != 0)) {
+	if ((adc.config->slow_pwm_trigger) && (adc.config->slow_count != 0)) {
 		ADC_InitStruct.ADC_ExternalTrigConvEdge =
 		ADC_ExternalTrigConvEdge_Rising;
 	} else {
@@ -261,10 +195,10 @@ uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
 	// END OF COMMON ADC INIT
 
 	// SLOW SEQUENCE CONFIGURATION
-	if (adc_config.slow_count > 0) {
+	if (adc.config->slow_count > 0) {
 		// ADC1 sequence config
-		for (i = 0; i < adc_config.slow_count; i++) {
-			ADC_RegularChannelConfig(ADC1, adc_config.slow_channel[i], i + 1,
+		for (i = 0; i < adc.config->slow_count; i++) {
+			ADC_RegularChannelConfig(ADC1, adc.config->slow_channel[i], i + 1,
 			ADC_SAMPLE_TIME);
 		}
 
@@ -277,60 +211,36 @@ uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
 	// END OF SLOW SEQUENCE CONFIGURATION
 
 	// FAST SEQUENCE CONFIGURATION
-	if (adc_config.fast_count[0] != 0) {
+	if (adc.config->fast_count[0] != 0) {
 		// injected config
 		// Add an extra conversion so that interrupt is guaranteed to
 		// be generated after ADC2 and ADC3 are done with conversion
-		ADC_InjectedSequencerLengthConfig(ADC1, adc_config.fast_count[0]);
-		ADC_InjectedChannelConfig(ADC1, adc_config.fast_channel[0][0], 1,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC1, adc_config.fast_channel[0][1], 2,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC1, adc_config.fast_channel[0][2], 3,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC1, adc_config.fast_channel[0][3], 4,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedSequencerLengthConfig(ADC2, adc_config.fast_count[1]);
-		ADC_InjectedChannelConfig(ADC2, adc_config.fast_channel[1][0], 1,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC2, adc_config.fast_channel[1][1], 2,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC2, adc_config.fast_channel[1][2], 3,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC2, adc_config.fast_channel[1][3], 4,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedSequencerLengthConfig(ADC3, adc_config.fast_count[2]);
-		ADC_InjectedChannelConfig(ADC3, adc_config.fast_channel[2][0], 1,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC3, adc_config.fast_channel[2][1], 2,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC3, adc_config.fast_channel[2][2], 3,
-		ADC_SAMPLE_TIME);
-		ADC_InjectedChannelConfig(ADC3, adc_config.fast_channel[2][3], 4,
-		ADC_SAMPLE_TIME);
+		ADC_InjectedSequencerLengthConfig(ADC1, adc.config->fast_count[0]);
+		for (i=0;i<adc.config->fast_count[0];i++){
+			ADC_InjectedChannelConfig(ADC1, adc.config->fast_channel[0][i], i+1, ADC_SAMPLE_TIME);
+		}
+		ADC_InjectedSequencerLengthConfig(ADC2, adc.config->fast_count[1]);
+		for (i=0;i<adc.config->fast_count[1];i++){
+			ADC_InjectedChannelConfig(ADC2, adc.config->fast_channel[1][i], i+1, ADC_SAMPLE_TIME);
+		}
+		ADC_InjectedSequencerLengthConfig(ADC3, adc.config->fast_count[2]);
+		for (i=0;i<adc.config->fast_count[2];i++){
+			ADC_InjectedChannelConfig(ADC3, adc.config->fast_channel[2][i], i+1, ADC_SAMPLE_TIME);
+		}
 
 		// injected trigger
-		if (adc_config.fast_pwm_trigger) {
-			ADC_ExternalTrigInjectedConvEdgeConfig(ADC1,
-			ADC_ExternalTrigInjecConvEdge_Rising);
-			ADC_ExternalTrigInjectedConvEdgeConfig(ADC2,
-			ADC_ExternalTrigInjecConvEdge_Rising);
-			ADC_ExternalTrigInjectedConvEdgeConfig(ADC3,
-			ADC_ExternalTrigInjecConvEdge_Rising);
+		if (adc.config->fast_pwm_trigger) {
+			ADC_ExternalTrigInjectedConvEdgeConfig(ADC1, ADC_ExternalTrigInjecConvEdge_Rising);
+			ADC_ExternalTrigInjectedConvEdgeConfig(ADC2, ADC_ExternalTrigInjecConvEdge_Rising);
+			ADC_ExternalTrigInjectedConvEdgeConfig(ADC3, ADC_ExternalTrigInjecConvEdge_Rising);
 		} else {
-			ADC_ExternalTrigInjectedConvEdgeConfig(ADC1,
-			ADC_ExternalTrigInjecConvEdge_None);
-			ADC_ExternalTrigInjectedConvEdgeConfig(ADC2,
-			ADC_ExternalTrigInjecConvEdge_None);
-			ADC_ExternalTrigInjectedConvEdgeConfig(ADC3,
-			ADC_ExternalTrigInjecConvEdge_None);
+			ADC_ExternalTrigInjectedConvEdgeConfig(ADC1, ADC_ExternalTrigInjecConvEdge_None);
+			ADC_ExternalTrigInjectedConvEdgeConfig(ADC2, ADC_ExternalTrigInjecConvEdge_None);
+			ADC_ExternalTrigInjectedConvEdgeConfig(ADC3, ADC_ExternalTrigInjecConvEdge_None);
 		}
-		ADC_ExternalTrigInjectedConvConfig(ADC1,
-		ADC_ExternalTrigInjecConv_T1_TRGO);
-		ADC_ExternalTrigInjectedConvConfig(ADC2,
-		ADC_ExternalTrigInjecConv_T1_TRGO);
-		ADC_ExternalTrigInjectedConvConfig(ADC3,
-		ADC_ExternalTrigInjecConv_T1_TRGO);
+		ADC_ExternalTrigInjectedConvConfig(ADC1, ADC_ExternalTrigInjecConv_T1_TRGO);
+		ADC_ExternalTrigInjectedConvConfig(ADC2, ADC_ExternalTrigInjecConv_T1_TRGO);
+		ADC_ExternalTrigInjectedConvConfig(ADC3, ADC_ExternalTrigInjecConv_T1_TRGO);
 
 		// JADC interrupt
 		ADC_ITConfig(ADC1, ADC_IT_JEOC, ENABLE);
@@ -342,12 +252,9 @@ uint32_t adc_init(void (*slow_handler)(void), void (*fast_handler)(void)) {
 	NVIC_EnableIRQ(ADC_IRQn);
 
 	// start ADC
-	if ((adc_config.fast_count[0] != 0) || (adc_config.slow_count != 0))
-		ADC_Cmd(ADC1, ENABLE);
-	if (adc_config.fast_count[1] != 0)
-		ADC_Cmd(ADC2, ENABLE);
-	if (adc_config.fast_count[2] != 0)
-		ADC_Cmd(ADC3, ENABLE);
+	if ((adc.config->fast_count[0] != 0) || (adc.config->slow_count != 0)) ADC_Cmd(ADC1, ENABLE);
+	if (adc.config->fast_count[1] != 0) ADC_Cmd(ADC2, ENABLE);
+	if (adc.config->fast_count[2] != 0) ADC_Cmd(ADC3, ENABLE);
 
 	// success
 	return 0;
@@ -372,8 +279,8 @@ void adc_sw_trigger_fast(void) {
 // -----------------------------------------------------------------------------
 // ADC read
 // -----------------------------------------------------------------------------
-uint32_t adc_read(adc_channel_t channel) {
-	if (channel >= ADC_CH_COUNT)
+uint32_t adc_read(uint32_t channel) {
+	if (channel >= adc.count)
 		return 0;
 	else
 		return adc.raw[channel];
@@ -401,19 +308,19 @@ void ADC_IRQHandler(void) {
 	// store converted values
 	j = 0;
 	// ADC1
-	for (i = 0; i < adc_config.fast_count[0]; i++) {
+	for (i = 0; i < adc.config->fast_count[0]; i++) {
 		adc.raw[j] = ADC_GetInjectedConversionValue(ADC1,
 		ADC_InjectedChannel_1 + 4 * i);
 		j++;
 	}
 	// ADC2
-	for (i = 0; i < adc_config.fast_count[1]; i++) {
+	for (i = 0; i < adc.config->fast_count[1]; i++) {
 		adc.raw[j] = ADC_GetInjectedConversionValue(ADC2,
 		ADC_InjectedChannel_1 + 4 * i);
 		j++;
 	}
 	// ADC3
-	for (i = 0; i < adc_config.fast_count[2]; i++) {
+	for (i = 0; i < adc.config->fast_count[2]; i++) {
 		adc.raw[j] = ADC_GetInjectedConversionValue(ADC3,
 		ADC_InjectedChannel_1 + 4 * i);
 		j++;
