@@ -53,14 +53,20 @@
  <item type="parsecontrol" name="FB FAST CH2:" returntype="double" search="D3" offset=" 6" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
  <item type="parsecontrol" name="FB FAST CH3:" returntype="double" search="D3" offset="10" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
  <item type="parsecontrol" name="FB FAST CH4:" returntype="double" search="D3" offset="14" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB FAST CH5:" returntype="double" search="D3" offset="18" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB FAST CH6:" returntype="double" search="D3" offset="22" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB FAST CH7:" returntype="double" search="D3" offset="26" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB FAST CH8:" returntype="double" search="D3" offset="30" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB SLOW CH1:" returntype="double" search="D3" offset="34" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB SLOW CH2:" returntype="double" search="D3" offset="38" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB SLOW CH3:" returntype="double" search="D3" offset="42" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
- <item type="parsecontrol" name="FB SLOW CH4:" returntype="double" search="D3" offset="46" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB FAST CH1:" returntype="double" search="D3" offset="18" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB FAST CH2:" returntype="double" search="D3" offset="22" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB FAST CH3:" returntype="double" search="D3" offset="26" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB FAST CH1:" returntype="double" search="D3" offset="30" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB FAST CH2:" returntype="double" search="D3" offset="34" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB FAST CH3:" returntype="double" search="D3" offset="38" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH1:" returntype="double" search="D3" offset="42" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH2:" returntype="double" search="D3" offset="46" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH3:" returntype="double" search="D3" offset="50" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH4:" returntype="double" search="D3" offset="54" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH5:" returntype="double" search="D3" offset="58" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH6:" returntype="double" search="D3" offset="62" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH7:" returntype="double" search="D3" offset="66" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
+ <item type="parsecontrol" name="FB SLOW CH8:" returntype="double" search="D3" offset="70" datatype="uint16" mathscaling="1.0" mathoffset="0.0" format="0" />
 </tabcontrol>
 </serialcomm>
 <!--  

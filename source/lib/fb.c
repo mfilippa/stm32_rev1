@@ -17,6 +17,11 @@ struct fb_struct {
 uint32_t fb_init(fb_table_t * fb_table, uint32_t tsize){
 	uint32_t i;
 	if (tsize==0) return 1;
+
+	// store data
+	fb.table = fb_table;
+	fb.tsize = tsize;
+
 	// zero everything
 	for (i=0; i< fb.tsize; i++){
 		fb.table[i].offset = fb.table[i].raw = fb.table[i].value = 0;

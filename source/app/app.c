@@ -11,6 +11,29 @@
 #define APP_COMM_BUFFER_SIZE	1024
 #define APP_DEBUG_BUFFER_SIZE	1024
 
+// ADC channels
+enum adc_channels_enum {
+	ADC_FAST_CH1=0,
+	ADC_FAST_CH2,
+	ADC_FAST_CH3,
+	ADC_FAST_CH4,
+	ADC_FAST_CH5,
+	ADC_FAST_CH6,
+	ADC_FAST_CH7,
+	ADC_FAST_CH8,
+	ADC_FAST_CH9,
+	ADC_FAST_CH10,
+	ADC_SLOW_CH1,
+	ADC_SLOW_CH2,
+	ADC_SLOW_CH3,
+	ADC_SLOW_CH4,
+	ADC_SLOW_CH5,
+	ADC_SLOW_CH6,
+	ADC_SLOW_CH7,
+	ADC_SLOW_CH8,
+	ADC_CH_COUNT,
+};
+
 // ADC configuration
 adc_config_t adc_config = {
 	// fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
@@ -34,6 +57,8 @@ struct app_struct {
 	uint8_t tx_buffer[APP_COMM_BUFFER_SIZE];
 	// debug buffer
 	debug_t debug_buffer[APP_DEBUG_BUFFER_SIZE];
+	// fb table
+	fb_table_t fb_table[ADC_CH_COUNT];
 } app;
 
 // prototypes
@@ -62,32 +87,34 @@ uint32_t app_init(void) {
 //	if (i2c_init()!=0)
 //		return 1;
 
-// initialize modules
-	if (sch_init() != 0)
-		return 1;
-	if (comm_init(APP_COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer,
-			&app_comm_handler) != 0)
-		return 1;
-	if (debug_init(app.debug_buffer, APP_DEBUG_BUFFER_SIZE) != 0)
-		return 1;
-//	if (fb_init() != 0) XXX
-//		return 1;
+	// initialize modules
+	if (sch_init() != 0) return 1;
+	if (comm_init(APP_COMM_BUFFER_SIZE, app.rx_buffer,
+			app.tx_buffer, &app_comm_handler) != 0) return 1;
+	if (debug_init(app.debug_buffer, APP_DEBUG_BUFFER_SIZE) != 0) return 1;
+	if (fb_init(app.fb_table, FB_CH_COUNT) != 0) return 1;
 
-// initialize feedbacks
-//	fb_store_params(FB_FAST_CH1, 1, 0, INT32_MIN, INT32_MAX); XXX
-//	fb_store_params(FB_FAST_CH2, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_FAST_CH3, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_FAST_CH4, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_FAST_CH5, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_FAST_CH6, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_FAST_CH7, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_FAST_CH8, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_SLOW_CH1, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_SLOW_CH2, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_SLOW_CH3, 1, 0, INT32_MIN, INT32_MAX);
-//	fb_store_params(FB_SLOW_CH4, 1, 0, INT32_MIN, INT32_MAX);
+	// initialize feedbacks
+	fb_store_params(FB_FAST_CH1, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH2, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH3, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH4, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH5, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH6, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH7, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH8, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH9, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_FAST_CH10, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH1, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH2, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH3, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH4, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH5, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH6, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH7, 1, 0, INT32_MIN, INT32_MAX);
+	fb_store_params(FB_SLOW_CH8, 1, 0, INT32_MIN, INT32_MAX);
 
-// register scheduled functions
+	// register scheduled functions
 	if (sch_function_register(&app_led_blink, 500) == 0)
 		return 1;
 	if (sch_function_register(&app_adc_trigger, 10) == 0)
@@ -143,10 +170,14 @@ void app_adc_trigger(void) {
 // -----------------------------------------------------------------------------
 void app_adc_process_slow(void) {
 	// process slow adc data
-//	fb_process(FB_SLOW_CH1, adc_read_slow(ADC_SLOW_CH1)); XXX
-//	fb_process(FB_SLOW_CH2, adc_read_slow(ADC_SLOW_CH2));
-//	fb_process(FB_SLOW_CH3, adc_read_slow(ADC_SLOW_CH3));
-//	fb_process(FB_SLOW_CH4, adc_read_slow(ADC_SLOW_CH4));
+	fb_process(FB_SLOW_CH1, adc_read(ADC_SLOW_CH1));
+	fb_process(FB_SLOW_CH2, adc_read(ADC_SLOW_CH2));
+	fb_process(FB_SLOW_CH3, adc_read(ADC_SLOW_CH3));
+	fb_process(FB_SLOW_CH4, adc_read(ADC_SLOW_CH4));
+	fb_process(FB_SLOW_CH5, adc_read(ADC_SLOW_CH5));
+	fb_process(FB_SLOW_CH6, adc_read(ADC_SLOW_CH6));
+	fb_process(FB_SLOW_CH7, adc_read(ADC_SLOW_CH7));
+	fb_process(FB_SLOW_CH8, adc_read(ADC_SLOW_CH8));
 }
 
 // -----------------------------------------------------------------------------
@@ -154,14 +185,16 @@ void app_adc_process_slow(void) {
 // -----------------------------------------------------------------------------
 void app_adc_process_fast(void) {
 	// process slow adc data
-//	fb_process(FB_FAST_CH1, adc_read_fast(ADC_FAST_CH1)); XXX
-//	fb_process(FB_FAST_CH2, adc_read_fast(ADC_FAST_CH2));
-//	fb_process(FB_FAST_CH3, adc_read_fast(ADC_FAST_CH3));
-//	fb_process(FB_FAST_CH4, adc_read_fast(ADC_FAST_CH4));
-//	fb_process(FB_FAST_CH5, adc_read_fast(ADC_FAST_CH5));
-//	fb_process(FB_FAST_CH6, adc_read_fast(ADC_FAST_CH6));
-//	fb_process(FB_FAST_CH7, adc_read_fast(ADC_FAST_CH7));
-//	fb_process(FB_FAST_CH8, adc_read_fast(ADC_FAST_CH8));
+	fb_process(FB_FAST_CH1, adc_read(ADC_FAST_CH1));
+	fb_process(FB_FAST_CH2, adc_read(ADC_FAST_CH2));
+	fb_process(FB_FAST_CH3, adc_read(ADC_FAST_CH3));
+	fb_process(FB_FAST_CH4, adc_read(ADC_FAST_CH4));
+	fb_process(FB_FAST_CH5, adc_read(ADC_FAST_CH5));
+	fb_process(FB_FAST_CH6, adc_read(ADC_FAST_CH6));
+	fb_process(FB_FAST_CH7, adc_read(ADC_FAST_CH7));
+	fb_process(FB_FAST_CH8, adc_read(ADC_FAST_CH8));
+	fb_process(FB_FAST_CH9, adc_read(ADC_FAST_CH9));
+	fb_process(FB_FAST_CH10, adc_read(ADC_FAST_CH10));
 }
 
 // -----------------------------------------------------------------------------
@@ -224,18 +257,24 @@ void app_comm_handler(uint32_t rx_size) {
 		break;
 	case 0xD3:
 		// fb data
-//		comm_write16(fb_get(FB_FAST_CH1)); XXX
-//		comm_write16(fb_get(FB_FAST_CH2));
-//		comm_write16(fb_get(FB_FAST_CH3));
-//		comm_write16(fb_get(FB_FAST_CH4));
-//		comm_write16(fb_get(FB_FAST_CH5));
-//		comm_write16(fb_get(FB_FAST_CH6));
-//		comm_write16(fb_get(FB_FAST_CH7));
-//		comm_write16(fb_get(FB_FAST_CH8));
-//		comm_write16(fb_get(FB_SLOW_CH1));
-//		comm_write16(fb_get(FB_SLOW_CH2));
-//		comm_write16(fb_get(FB_SLOW_CH3));
-//		comm_write16(fb_get(FB_SLOW_CH4));
+		comm_write16(fb_get(FB_FAST_CH1));
+		comm_write16(fb_get(FB_FAST_CH2));
+		comm_write16(fb_get(FB_FAST_CH3));
+		comm_write16(fb_get(FB_FAST_CH4));
+		comm_write16(fb_get(FB_FAST_CH5));
+		comm_write16(fb_get(FB_FAST_CH6));
+		comm_write16(fb_get(FB_FAST_CH7));
+		comm_write16(fb_get(FB_FAST_CH8));
+		comm_write16(fb_get(FB_FAST_CH9));
+		comm_write16(fb_get(FB_FAST_CH10));
+		comm_write16(fb_get(FB_SLOW_CH1));
+		comm_write16(fb_get(FB_SLOW_CH2));
+		comm_write16(fb_get(FB_SLOW_CH3));
+		comm_write16(fb_get(FB_SLOW_CH4));
+		comm_write16(fb_get(FB_SLOW_CH5));
+		comm_write16(fb_get(FB_SLOW_CH6));
+		comm_write16(fb_get(FB_SLOW_CH7));
+		comm_write16(fb_get(FB_SLOW_CH8));
 		break;
 
 	default:
