@@ -8,6 +8,14 @@
 // system includes
 #include <stdint.h>
 
+// io channels
+enum io_channel_enum {
+	IO_LED = 0,			// LED
+	IO_DEBUG1,			// DEBUG1
+	IO_DEBUG2,			// DEBUG2
+	IO_CH_COUNT,
+};
+
 // feedback channels
 enum fb_channel_enum {
 	FB_FAST_CH1=0,

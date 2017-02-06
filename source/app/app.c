@@ -50,6 +50,16 @@ adc_config_t adc_config = {
 	0,
 };
 
+// io config
+io_config_t io_config[3] = {
+	// LED: PC13
+	{2,13,1},
+	// DEBUG1: C6
+	{2,6,1},
+	// DEBUG2: C7
+	{2,7,1},
+};
+
 // module structure
 struct app_struct {
 	// comm buffers
@@ -75,7 +85,7 @@ uint32_t app_init(void) {
 	// initialize hardware
 	if (sys_tick_init(1000, &app_systick) != 0)
 		return 1;
-	if (io_init() != 0)
+	if (io_init(io_config, IO_CH_COUNT) != 0)
 		return 1;
 	if (uart_init(115200) != 0)
 		return 1;

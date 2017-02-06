@@ -15,17 +15,36 @@ typedef struct io_pin_struct{
 
 // module structure
 struct io_struct {
-	io_pin_t pin[IO_CHANNEL_COUNT];
+	io_config_t * config;
+	uint32_t tsize;
 } io;
 
+// port mapping
+GPIO_TypeDef * io_port_map[4] = { GPIOA, GPIOB, GPIOC, GPIOD };
+
+// pin mapping
+uint16_t io_pin_map[16] = { GPIO_Pin_0, GPIO_Pin_1, GPIO_Pin_2, GPIO_Pin_3,
+	GPIO_Pin_4, GPIO_Pin_5, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_8, GPIO_Pin_9,
+	GPIO_Pin_10, GPIO_Pin_11, GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15,
+};
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t io_init(void){
+uint32_t io_init(io_config_t * io_config, uint32_t tsize){
 
 	GPIO_InitTypeDef gpio;
 	uint32_t i;
+
+	// store data
+	io.config = io_config;
+	io.tsize = tsize;
+
+	// range check
+	for (i=0;i<io.tsize;i++){
+		if (io.config[i].port>3) return 1;
+		if (io.config[i].pin>15) return 1;
+	}
 
 	// enable all required peripheral clocks here -----------
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -34,29 +53,20 @@ uint32_t io_init(void){
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	// ------------------------------------------------------
 
-	// configure pins here ----------------------------------
-	// LED
-	io.pin[IO_LED].port = GPIOC;
-	io.pin[IO_LED].pin_nr = GPIO_Pin_13;
-	io.pin[IO_LED].mode = GPIO_Mode_OUT;
-	// DEBUG1
-	io.pin[IO_DEBUG1].port = GPIOC;
-	io.pin[IO_DEBUG1].pin_nr = GPIO_Pin_6;
-	io.pin[IO_DEBUG1].mode = GPIO_Mode_OUT;
-	// DEBUG2
-	io.pin[IO_DEBUG2].port = GPIOC;
-	io.pin[IO_DEBUG2].pin_nr = GPIO_Pin_7;
-	io.pin[IO_DEBUG2].mode = GPIO_Mode_OUT;
-	// ------------------------------------------------------
-
 	// configure pins
-	for (i = 0; i < IO_CHANNEL_COUNT; ++i) {
-		gpio.GPIO_Pin = io.pin[i].pin_nr;
-		gpio.GPIO_Mode = io.pin[i].mode;
+	for (i = 0; i < io.tsize; ++i) {
+		gpio.GPIO_Pin = io_pin_map[io.config[i].pin];
+		if (io.config[i].type==0) {
+			// input
+			gpio.GPIO_Mode = GPIO_Mode_IN;
+		} else {
+			// output
+			gpio.GPIO_Mode = GPIO_Mode_OUT;
+		}
 		gpio.GPIO_OType = GPIO_OType_PP;
 		gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
 		gpio.GPIO_Speed = GPIO_High_Speed;
-		GPIO_Init(io.pin[i].port, &gpio);
+		GPIO_Init(io_port_map[io.config[i].port], &gpio);
 	}
 
 	// success
@@ -66,33 +76,33 @@ uint32_t io_init(void){
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void io_set(io_channel_t channel){
-	if (channel<IO_CHANNEL_COUNT) {
-		io.pin[channel].port->BSRRL = io.pin[channel].pin_nr;
+void io_set(uint32_t channel){
+	if (channel<io.tsize) {
+		io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
 	}
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-void io_reset(io_channel_t channel){
-	if (channel<IO_CHANNEL_COUNT) {
-		io.pin[channel].port->BSRRH = io.pin[channel].pin_nr;
+void io_reset(uint32_t channel){
+	if (channel<io.tsize) {
+		io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
 	}
 }
 
 // -----------------------------------------------------------------------------
 // toggle
 // -----------------------------------------------------------------------------
-uint32_t io_toggle(io_channel_t channel){
+uint32_t io_toggle(uint32_t channel){
 	uint32_t state = 0;
-	if (channel<IO_CHANNEL_COUNT) {
-		if (((io.pin[channel].port->ODR) & io.pin[channel].pin_nr) != (uint32_t)Bit_RESET) {
-			io.pin[channel].port->BSRRH = io.pin[channel].pin_nr;
+	if (channel<io.tsize) {
+		if (((io_port_map[io.config[channel].port]->ODR) & io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET) {
+			io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
 			state = 0;
 		}
 		else {
-			io.pin[channel].port->BSRRL = io.pin[channel].pin_nr;
+			io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
 			state = 1;
 		}
 	}
@@ -102,10 +112,10 @@ uint32_t io_toggle(io_channel_t channel){
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
-uint32_t io_read(io_channel_t channel){
+uint32_t io_read(uint32_t channel){
 	uint32_t state = 0;
-	if (channel<IO_CHANNEL_COUNT){
-		if ((io.pin[channel].port->IDR & io.pin[channel].pin_nr) != (uint32_t)Bit_RESET)  {
+	if (channel<io.tsize){
+		if ((io_port_map[io.config[channel].port]->IDR & io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET)  {
 			state = 1;
 		}
 		else {
