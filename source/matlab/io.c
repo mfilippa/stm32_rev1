@@ -8,18 +8,18 @@
 
 // module structure
 struct io_struct {
-	double * pin[IO_CHANNEL_COUNT];
+	io_config_t * config;
+	uint32_t tsize;
 } io;
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t io_init(void){
+uint32_t io_init(io_config_t * io_config, uint32_t tsize){
 
-	// pin mapping
-	io.pin[IO_LED] 	  =	&(pout[20]);
-	io.pin[IO_DEBUG1] = &(pout[21]);
-	io.pin[IO_DEBUG2] = &(pout[22]);
+	// store data
+	io.config = io_config;
+	io.tsize = tsize;
 
 	// success
 	return 0;
@@ -28,28 +28,27 @@ uint32_t io_init(void){
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void io_set(io_channel_t channel){
-	if (channel>=IO_CHANNEL_COUNT) return;
-	if (io.pin[channel]==0) return;
-	*(io.pin[channel]) = 1;
+void io_set(uint32_t channel){
+	if (channel>=io.tsize) return;
+	io.config[channel].state = 1;
+	pout[io.config[channel].port] = 1;
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-void io_reset(io_channel_t channel){
-	if (channel>=IO_CHANNEL_COUNT) return;
-	if (io.pin[channel]==0) return;
-	*(io.pin[channel]) = 0;
+void io_reset(uint32_t channel){
+	if (channel>=io.tsize) return;
+	io.config[channel].state = 0;
+	pout[io.config[channel].port] = 0;
 }
 
 // -----------------------------------------------------------------------------
 // toggle
 // -----------------------------------------------------------------------------
-uint32_t io_toggle(io_channel_t channel){
-	if (channel>=IO_CHANNEL_COUNT) return 0;
-	if (io.pin[channel]==0) return 0;
-	if (*(io.pin[channel]) == 0) {
+uint32_t io_toggle(uint32_t channel){
+	if (channel>=io.tsize) return 0;
+	if (io.config[channel].state == 0) {
 		io_set(channel);
 		return 1;
 	} else {
@@ -61,10 +60,9 @@ uint32_t io_toggle(io_channel_t channel){
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
-uint32_t io_read(io_channel_t channel){
-	if (channel>=IO_CHANNEL_COUNT) return 0;
-	if (io.pin[channel]==0) return 0;
-	if (*(io.pin[channel]) == 0) {
+uint32_t io_read(uint32_t channel){
+	if (channel>=io.tsize) return 0;
+	if (pin[io.config[channel].port] == 0) {
 		return 0;
 	} else {
 		return 1;

@@ -8,6 +8,7 @@
 // system includes
 #include <stdint.h>
 
+#ifndef MATLAB
 // ADC configuration table
 typedef struct adc_config_struct {
 	// fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
@@ -23,6 +24,15 @@ typedef struct adc_config_struct {
 	// trigger: 1 for pwm, 0 for sw
 	uint32_t slow_pwm_trigger;
 } adc_config_t;
+#else
+// ADC configuration table
+typedef struct adc_config_struct {
+	// port (pin) start index
+	uint32_t pin_start;
+	// nr of channels
+	uint32_t nr_channels;
+} adc_config_t;
+#endif
 
 // init: intializes the module, return 0 if successful
 // pass function pointers if interrupts are to be generated after

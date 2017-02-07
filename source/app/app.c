@@ -34,6 +34,7 @@ enum adc_channels_enum {
 	ADC_CH_COUNT,
 };
 
+#ifndef MATLAB
 // ADC configuration
 adc_config_t adc_config = {
 	// fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
@@ -49,7 +50,16 @@ adc_config_t adc_config = {
 	// trigger: 1 for pwm, 0 for sw
 	0,
 };
+#else
+adc_config_t adc_config = {
+	// pin start
+	0,
+	// nr of channels
+	ADC_CH_COUNT,
+};
+#endif
 
+#ifndef MATLAB
 // io config
 io_config_t io_config[3] = {
 	// LED: PC13
@@ -59,6 +69,17 @@ io_config_t io_config[3] = {
 	// DEBUG2: C7
 	{2,7,1},
 };
+#else
+// io config
+io_config_t io_config[3] = {
+	// LED: pout[20]
+	{20,1,0},
+	// DEBUG1: pout[21]
+	{21,1,0},
+	// DEBUG2: pout[22]
+	{22,1,0},
+};
+#endif
 
 // module structure
 struct app_struct {

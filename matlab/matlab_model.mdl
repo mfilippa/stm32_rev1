@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.124"
+    ComputedModelVersion    "1.128"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -67,9 +67,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "mfili"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Jan 23 15:46:22 2017"
-  RTWModifiedTimeStamp	  407087180
-  ModelVersionFormat	  "1.%<AutoIncrement:124>"
+  LastModifiedDate	  "Tue Feb 07 00:52:39 2017"
+  RTWModifiedTimeStamp	  408329546
+  ModelVersionFormat	  "1.%<AutoIncrement:128>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -949,19 +949,8 @@ Model {
       BlockType		      Gain
       Name		      "3.3V to ADC\nfast channels"
       SID		      "434"
-      Position		      [110, 105, 140, 135]
+      Position		      [90, 180, 120, 210]
       ZOrder		      35
-      Gain		      "4096/3.3"
-      ParamDataTypeStr	      "Inherit: Inherit via internal rule"
-      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-      SaturateOnIntegerOverflow	off
-    }
-    Block {
-      BlockType		      Gain
-      Name		      "3.3V to ADC\nslow channels"
-      SID		      "435"
-      Position		      [110, 225, 140, 255]
-      ZOrder		      36
       Gain		      "4096/3.3"
       ParamDataTypeStr	      "Inherit: Inherit via internal rule"
       OutDataTypeStr	      "Inherit: Inherit via internal rule"
@@ -971,21 +960,11 @@ Model {
       BlockType		      Demux
       Name		      "Demux"
       SID		      "428"
-      Ports		      [1, 8]
-      Position		      [175, 57, 180, 178]
+      Ports		      [1, 18]
+      Position		      [185, 59, 190, 326]
       ZOrder		      29
       ShowName		      off
-      Outputs		      "8"
-      DisplayOption	      "bar"
-    }
-    Block {
-      BlockType		      Demux
-      Name		      "Demux1"
-      SID		      "431"
-      Ports		      [1, 4]
-      Position		      [175, 209, 180, 266]
-      ZOrder		      31
-      ShowName		      off
+      Outputs		      "18"
       DisplayOption	      "bar"
     }
     Block {
@@ -1065,9 +1044,9 @@ Model {
       BlockType		      Constant
       Name		      "fast ch"
       SID		      "443"
-      Position		      [20, 105, 50, 135]
+      Position		      [0, 180, 30, 210]
       ZOrder		      44
-      Value		      "[ 1 2 1 2 1 2 1 2]"
+      Value		      "[ 1.12 2 3 1 2 3 1 2 3  1 2.12 3 1 2 3 1 2 3 ]"
     }
     Block {
       BlockType		      Scope
@@ -1145,7 +1124,6 @@ Model {
       Location		      [188, 390, 1240, 916]
       Open		      off
       NumInputPorts	      "1"
-      ZoomMode		      "xonly"
       List {
 	ListType		AxesTitles
 	axes1			"%<SignalLabel>"
@@ -1227,14 +1205,6 @@ Model {
       DataFormat	      "StructureWithTime"
       LimitDataPoints	      off
       SampleTime	      "0"
-    }
-    Block {
-      BlockType		      Constant
-      Name		      "slow ch"
-      SID		      "433"
-      Position		      [20, 225, 50, 255]
-      ZOrder		      34
-      Value		      "[ 1 2 1 2]"
     }
     Block {
       BlockType		      SubSystem
@@ -2430,7 +2400,6 @@ Model {
       ZOrder		      169
       SrcBlock		      "source code"
       SrcPort		      1
-      Points		      [40, 0]
       DstBlock		      "Mux"
       DstPort		      1
     }
@@ -2527,57 +2496,81 @@ Model {
       DstPort		      1
     }
     Line {
-      ZOrder		      196
-      SrcBlock		      "Demux1"
-      SrcPort		      1
-      Points		      [0, 0]
-      DstBlock		      "source code"
-      DstPort		      11
-    }
-    Line {
-      ZOrder		      200
-      SrcBlock		      "Demux1"
-      SrcPort		      2
-      Points		      [0, 0]
-      DstBlock		      "source code"
-      DstPort		      12
-    }
-    Line {
-      ZOrder		      201
-      SrcBlock		      "Demux1"
-      SrcPort		      3
-      Points		      [0, 0]
-      DstBlock		      "source code"
-      DstPort		      13
-    }
-    Line {
-      ZOrder		      198
-      SrcBlock		      "Demux1"
-      SrcPort		      4
-      Points		      [0, 0]
-      DstBlock		      "source code"
-      DstPort		      14
-    }
-    Line {
-      ZOrder		      206
-      SrcBlock		      "3.3V to ADC\nslow channels"
-      SrcPort		      1
-      DstBlock		      "Demux1"
-      DstPort		      1
-    }
-    Line {
-      ZOrder		      205
-      SrcBlock		      "slow ch"
-      SrcPort		      1
-      DstBlock		      "3.3V to ADC\nslow channels"
-      DstPort		      1
-    }
-    Line {
       ZOrder		      217
       SrcBlock		      "fast ch"
       SrcPort		      1
       DstBlock		      "3.3V to ADC\nfast channels"
       DstPort		      1
+    }
+    Line {
+      ZOrder		      218
+      SrcBlock		      "Demux"
+      SrcPort		      9
+      DstBlock		      "source code"
+      DstPort		      9
+    }
+    Line {
+      ZOrder		      219
+      SrcBlock		      "Demux"
+      SrcPort		      10
+      DstBlock		      "source code"
+      DstPort		      10
+    }
+    Line {
+      ZOrder		      220
+      SrcBlock		      "Demux"
+      SrcPort		      11
+      DstBlock		      "source code"
+      DstPort		      11
+    }
+    Line {
+      ZOrder		      221
+      SrcBlock		      "Demux"
+      SrcPort		      12
+      DstBlock		      "source code"
+      DstPort		      12
+    }
+    Line {
+      ZOrder		      222
+      SrcBlock		      "Demux"
+      SrcPort		      13
+      DstBlock		      "source code"
+      DstPort		      13
+    }
+    Line {
+      ZOrder		      223
+      SrcBlock		      "Demux"
+      SrcPort		      14
+      DstBlock		      "source code"
+      DstPort		      14
+    }
+    Line {
+      ZOrder		      224
+      SrcBlock		      "Demux"
+      SrcPort		      15
+      DstBlock		      "source code"
+      DstPort		      15
+    }
+    Line {
+      ZOrder		      225
+      SrcBlock		      "Demux"
+      SrcPort		      16
+      DstBlock		      "source code"
+      DstPort		      16
+    }
+    Line {
+      ZOrder		      226
+      SrcBlock		      "Demux"
+      SrcPort		      17
+      DstBlock		      "source code"
+      DstPort		      17
+    }
+    Line {
+      ZOrder		      227
+      SrcBlock		      "Demux"
+      SrcPort		      18
+      DstBlock		      "source code"
+      DstPort		      18
     }
   }
 }
