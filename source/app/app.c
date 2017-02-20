@@ -63,11 +63,11 @@ adc_config_t adc_config = {
 // io config
 io_config_t io_config[3] = {
 	// LED: PC13
-	{2,13,1},
+	{2,13,1,1,0},
 	// DEBUG1: C6
-	{2,6,1},
+	{2,6,1,1,0},
 	// DEBUG2: C7
-	{2,7,1},
+	{2,7,1,1,0},
 };
 #else
 // io config
