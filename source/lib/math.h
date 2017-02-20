@@ -26,8 +26,12 @@
 // macro abs
 #define QMATH_ABS(a) (((a) < 0) ? -(a) : (a))
 
-// macro fast average. Implements avg = -(avg>>N) + (sample>>N)
-#define MATH_FAST_AVG(avg,sample,N) (((avg)<<16)-(((avg)<<16)>>(N))+(((sample)<<16)>>(N)))>>16;
+// macro weighted average
+// avg is average variable, new is sample to be averaged
+// mem is used as high precision memory, N is weight factor (1/2^N)
+#define MATH_FAST_AVG(avg,new,mem,N) \
+	(mem)= (mem)-((mem)>>N)+(((new)<<16)>>N); \
+	(avg) = (mem)>>16;
 
 // biquad filter struct
 typedef struct math_biquad_struct {
