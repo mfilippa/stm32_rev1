@@ -26,6 +26,9 @@
 // macro abs
 #define QMATH_ABS(a) (((a) < 0) ? -(a) : (a))
 
+// macro fast average. Implements avg = -(avg>>N) + (sample>>N)
+#define MATH_FAST_AVG(avg,sample,N) (((avg)<<16)-(((avg)<<16)>>(N))+(((sample)<<16)>>(N)))>>16;
+
 // biquad filter struct
 typedef struct math_biquad_struct {
 	int32_t b0;			// b0 coefficient in Q format

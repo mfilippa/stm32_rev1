@@ -6,13 +6,6 @@
 #include "stm32f4xx.h"
 #include "hal/io.h"
 
-// pin typedef
-typedef struct io_pin_struct{
-	GPIO_TypeDef * port;		// pin port
-	uint32_t pin_nr;			// pin nr
-	GPIOMode_TypeDef mode;		// mode: OUT or IN
-} io_pin_t;
-
 // module structure
 struct io_struct {
 	io_config_t * config;
@@ -66,6 +59,9 @@ uint32_t io_init(io_config_t * io_config, uint32_t tsize){
 		gpio.GPIO_OType = GPIO_OType_PP;
 		gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
 		gpio.GPIO_Speed = GPIO_High_Speed;
+		// initial state
+		if (io.config[i].state==0) io_reset(i);
+		else io_set(i);
 		GPIO_Init(io_port_map[io.config[i].port], &gpio);
 	}
 
@@ -78,7 +74,11 @@ uint32_t io_init(io_config_t * io_config, uint32_t tsize){
 // -----------------------------------------------------------------------------
 void io_set(uint32_t channel){
 	if (channel<io.tsize) {
-		io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
+		if(io.config[channel].ah==0){
+			io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
+		} else {
+			io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
+		}
 	}
 }
 
@@ -87,7 +87,11 @@ void io_set(uint32_t channel){
 // -----------------------------------------------------------------------------
 void io_reset(uint32_t channel){
 	if (channel<io.tsize) {
-		io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
+		if(io.config[channel].ah==0){
+			io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
+		} else {
+			io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
+		}
 	}
 }
 
