@@ -409,6 +409,11 @@
               <FileType>1</FileType>
               <FilePath>..\source\lib\fb.c</FilePath>
             </File>
+            <File>
+              <FileName>sm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\lib\sm.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

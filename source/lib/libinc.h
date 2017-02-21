@@ -13,5 +13,6 @@
 #include "lib/debug.h"
 #include "lib/fb.h"
 #include "lib/math.h"
+#include "lib/sm.h"
 
 #endif // _LIBINC_H_
