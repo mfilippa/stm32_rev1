@@ -104,23 +104,18 @@ void app_adc_trigger(void);
 uint32_t app_init(void) {
 
 	// initialize hardware
-	if (sys_tick_init(1000, &app_systick) != 0)
-		return 1;
-	if (io_init(io_config, IO_CH_COUNT) != 0)
-		return 1;
-	if (uart_init(115200) != 0)
-		return 1;
+	if (sys_tick_init(1000, &app_systick) != 0) return 1;
+	if (io_init(io_config, IO_CH_COUNT) != 0) return 1;
+	if (uart_init(UART0, UART_BAUD_115200) != 0) return 1;
+	if (uart_init(UART1, UART_BAUD_115200) != 0) return 1;
 	if (adc_init(&adc_config, &app_adc_process_slow, &app_adc_process_fast)
-			!= 0)
-		return 1;
-//	if (pwm_init(0) != 0)
-//		return 1;
-//	if (i2c_init()!=0)
-//		return 1;
+			!= 0) return 1;
+//	if (pwm_init(0) != 0) return 1;
+//	if (i2c_init()!=0) return 1;
 
 	// initialize modules
 	if (sch_init() != 0) return 1;
-	if (comm_init(APP_COMM_BUFFER_SIZE, app.rx_buffer,
+	if (comm_init(UART0, APP_COMM_BUFFER_SIZE, app.rx_buffer,
 			app.tx_buffer, &app_comm_handler) != 0) return 1;
 	if (debug_init(app.debug_buffer, APP_DEBUG_BUFFER_SIZE) != 0) return 1;
 	if (fb_init(app.fb_table, FB_CH_COUNT) != 0) return 1;
@@ -146,10 +141,8 @@ uint32_t app_init(void) {
 	fb_store_params(FB_SLOW_CH8, 1, 0, INT32_MIN, INT32_MAX);
 
 	// register scheduled functions
-	if (sch_function_register(&app_led_blink, 500) == 0)
-		return 1;
-	if (sch_function_register(&app_adc_trigger, 10) == 0)
-		return 1;
+	if (sch_function_register(&app_led_blink, 500) == 0) return 1;
+	if (sch_function_register(&app_adc_trigger, 10) == 0) return 1;
 
 	// success
 	return 0;
@@ -158,11 +151,26 @@ uint32_t app_init(void) {
 // -----------------------------------------------------------------------------
 // background
 // -----------------------------------------------------------------------------
+uint32_t wr_flag;
+uint32_t wr_data;
 void app_background(void) {
 	// comm step
 	comm_step();
 	// run scheduled tasks
 	sch_step();
+	// uart1 pass through
+	if (uart_read_ready(UART1)) {
+		wr_data = uart_read(UART1);
+		wr_flag = 1;
+	}
+	if (wr_flag) {
+		if (uart_write_ready(UART1)){
+			wr_flag = 0;
+			uart_write(UART1, wr_data+1);
+			io_toggle(IO_LED);
+		}
+	}
+
 }
 
 // -----------------------------------------------------------------------------

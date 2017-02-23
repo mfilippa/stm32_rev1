@@ -22,6 +22,9 @@ typedef enum comm_state_enum {
 // module structure
 struct comm_struct {
 
+	// uart
+	uart_t uart;
+
 	// buffer size
 	uint32_t buffer_size;
 
@@ -59,8 +62,11 @@ uint32_t comm_byte_to_ascii_low(uint32_t value);
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t comm_init(uint32_t buffer_size, uint8_t * rx_buffer, uint8_t * tx_buffer,
-		comm_handler_t * handler){
+uint32_t comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
+		uint8_t * tx_buffer, comm_handler_t * handler){
+	// save uart
+	if (uart>=UART_COUNT) return 1;
+	else comm.uart = uart;
 	// save buffer data
 	comm.buffer_size = buffer_size;
 	comm.rx_buffer = rx_buffer;
@@ -85,8 +91,8 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_IDLE:
 		// EVENT: received a char
-		if (uart_read_ready()==1){
-			uint32_t temp = (uint32_t) uart_read();
+		if (uart_read_ready(comm.uart)==1){
+			uint32_t temp = (uint32_t) uart_read(comm.uart);
 			// SUBEVENT: received start char, start rx
 			if (temp == COMM_FRAME_START) {
 				comm.index = 0;
@@ -97,10 +103,10 @@ void comm_step(void){
 		// EVENT: tx requested
 		else if (comm.tx_size != 0){
 			// SUBEVENT: uart is ready
-			if (uart_write_ready()==1){
+			if (uart_write_ready(comm.uart)==1){
 				// send start char
 				comm.index = 0;
-				uart_write((uint8_t)COMM_FRAME_START);
+				uart_write(comm.uart,(uint8_t)COMM_FRAME_START);
 				sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
 				comm.state = COMM_STATE_TX_HB;
 			}
@@ -109,8 +115,8 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_RX_START:	// start char received
 		// EVENT: received a char
-		if (uart_read_ready()){
-			uint32_t temp = (uint32_t) uart_read();
+		if (uart_read_ready(comm.uart)){
+			uint32_t temp = (uint32_t) uart_read(comm.uart);
 			// SUBEVENT: it is a HEX, store half byte, wait for other half
 			if (IS_HEX(temp)){
 				comm.half_byte = temp;
@@ -128,8 +134,8 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_RX_HB:	// half byte received
 		// EVENT: received a char
-		if (uart_read_ready()==1){
-			uint32_t temp = (uint32_t) uart_read();
+		if (uart_read_ready(comm.uart)==1){
+			uint32_t temp = (uint32_t) uart_read(comm.uart);
 			// SUBEVENT: it is a HEX, store in buffer
 			if (IS_HEX(temp)){
 				comm.rx_buffer[comm.index] =
@@ -149,8 +155,8 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_RX_DATA:	// data byte received
 		// EVENT: received a char
-		if (uart_read_ready()==1){
-			uint32_t temp = (uint32_t) uart_read();
+		if (uart_read_ready(comm.uart)==1){
+			uint32_t temp = (uint32_t) uart_read(comm.uart);
 			// SUBEVENT: it is a HEX
 			if (IS_HEX(temp)){
 				// index is less than buffer size, store and continue
@@ -182,9 +188,9 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_TX_HB:	// waiting to send half byte
 		// EVENT: iface is ready
-		if (uart_write_ready()==1){
+		if (uart_write_ready(comm.uart)==1){
 			// send half byte and wait
-			uart_write((uint8_t)comm_byte_to_ascii_high((uint32_t)comm.tx_buffer[comm.index]));
+			uart_write(comm.uart,(uint8_t)comm_byte_to_ascii_high((uint32_t)comm.tx_buffer[comm.index]));
 			sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
 			comm.state = COMM_STATE_TX_DATA;
 		}
@@ -197,9 +203,9 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_TX_DATA:	// waiting to send other half byte
 		// EVENT: iface is ready
-		if (uart_write_ready()==1){
+		if (uart_write_ready(comm.uart)==1){
 			// send other half byte
-			uart_write((uint8_t)comm_byte_to_ascii_low((uint32_t)comm.tx_buffer[comm.index]));
+			uart_write(comm.uart,(uint8_t)comm_byte_to_ascii_low((uint32_t)comm.tx_buffer[comm.index]));
 			comm.index++;
 			comm.tx_size--;
 			// SUBEVENT: more data to send
@@ -222,9 +228,9 @@ void comm_step(void){
 	//-------------------------------------------------------
 	case COMM_STATE_TX_END:	// waiting to end char
 		// EVENT: iface is ready
-		if (uart_write_ready()==1){
+		if (uart_write_ready(comm.uart)==1){
 			// send end char
-			uart_write((uint8_t)COMM_FRAME_END);
+			uart_write(comm.uart,(uint8_t)COMM_FRAME_END);
 			comm.state = COMM_STATE_IDLE;
 		}
 		// handle timeout

@@ -8,19 +8,35 @@
 // system includes
 #include <stdint.h>
 
+// uart interfaces
+typedef enum uart_enum {
+	UART0 = 0,
+	UART1,
+	UART_COUNT
+} uart_t;
+
+// baud rates
+typedef enum uart_baud_enum {
+	UART_BAUD_9600=0,
+	UART_BAUD_115200,
+	UART_BAUD_COUNT,
+} uart_baud_t;
+
 // init: initialize module, returns zero if successful
-uint32_t uart_init(uint32_t baud_rate);
+// uart: picks a uart to initialize
+// baud: baud rate
+uint32_t uart_init(uart_t uart, uart_baud_t baud_rate);
 
 // write_ready: returns 1 if ready to write
-uint32_t uart_write_ready(void);
+uint32_t uart_write_ready(uart_t uart);
 
 // read_ready: returns 1 if ready to read
-uint32_t uart_read_ready(void);
+uint32_t uart_read_ready(uart_t uart);
 
 // write: sends a byte to uart
-void uart_write(uint32_t data);
+void uart_write(uart_t uart, uint32_t data);
 
 // read: reads a byte from uart
-uint32_t uart_read(void);
+uint32_t uart_read(uart_t uart);
 
 #endif // _UART_H_
