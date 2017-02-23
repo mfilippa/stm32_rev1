@@ -44,7 +44,8 @@ uint32_t uart_init(uart_t uart, uart_baud_t baud_rate){
 		GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_USART1);
 
 		// configure uart
-		uartdef.USART_BaudRate = baud_rate;
+		if (baud_rate==UART_BAUD_9600) uartdef.USART_BaudRate = 9600;
+		if (baud_rate==UART_BAUD_115200) uartdef.USART_BaudRate = 115200;
 		uartdef.USART_WordLength = USART_WordLength_8b;
 		uartdef.USART_StopBits = USART_StopBits_1;
 		uartdef.USART_Parity = USART_Parity_No;
@@ -80,7 +81,8 @@ uint32_t uart_init(uart_t uart, uart_baud_t baud_rate){
 		GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_UART5);
 
 		// configure uart
-		uartdef.USART_BaudRate = baud_rate;
+		if (baud_rate==UART_BAUD_9600) uartdef.USART_BaudRate = 9600;
+		if (baud_rate==UART_BAUD_115200) uartdef.USART_BaudRate = 115200;
 		uartdef.USART_WordLength = USART_WordLength_8b;
 		uartdef.USART_StopBits = USART_StopBits_1;
 		uartdef.USART_Parity = USART_Parity_No;
