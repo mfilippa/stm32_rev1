@@ -107,7 +107,7 @@ uint32_t app_init(void) {
 	if (sys_tick_init(1000, &app_systick) != 0) return 1;
 	if (io_init(io_config, IO_CH_COUNT) != 0) return 1;
 	if (uart_init(UART0, UART_BAUD_115200) != 0) return 1;
-	if (uart_init(UART1, UART_BAUD_115200) != 0) return 1;
+//	if (uart_init(UART1, UART_BAUD_115200) != 0) return 1;
 	if (adc_init(&adc_config, &app_adc_process_slow, &app_adc_process_fast)
 			!= 0) return 1;
 //	if (pwm_init(0) != 0) return 1;
@@ -151,26 +151,11 @@ uint32_t app_init(void) {
 // -----------------------------------------------------------------------------
 // background
 // -----------------------------------------------------------------------------
-uint32_t wr_flag;
-uint32_t wr_data;
 void app_background(void) {
 	// comm step
 	comm_step();
 	// run scheduled tasks
 	sch_step();
-	// uart1 pass through
-	if (uart_read_ready(UART1)) {
-		wr_data = uart_read(UART1);
-		wr_flag = 1;
-	}
-	if (wr_flag) {
-		if (uart_write_ready(UART1)){
-			wr_flag = 0;
-			uart_write(UART1, wr_data+1);
-			io_toggle(IO_LED);
-		}
-	}
-
 }
 
 // -----------------------------------------------------------------------------
