@@ -24,7 +24,7 @@
 		else var = target;
 
 // macro abs
-#define QMATH_ABS(a) (((a) < 0) ? -(a) : (a))
+#define MATH_ABS(a) (((a) < 0) ? -(a) : (a))
 
 // macro weighted average
 // avg is average variable, new is sample to be averaged

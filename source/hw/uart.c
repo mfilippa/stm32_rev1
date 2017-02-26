@@ -6,11 +6,6 @@
 #include "hal/uart.h"
 #include "stm32f4xx.h"
 
-// hardware description for STM32F4
-// APB2 - FCLK2 84MHz
-// PB6 - UART1_TX - AF7
-// PB7 - UART1_RX - AF7
-
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
