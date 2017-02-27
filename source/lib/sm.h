@@ -12,21 +12,32 @@ typedef void (sm_func_t)(void);
 typedef uint32_t (sm_test_func_t)(void);
 
 // state machine table
+// { state , entry_func , wait , next_state ,
+//   during_test , during_state , exit_test , exit_state },
 typedef struct sm_table_struct {
-	// state - MUST BE ORDERED NUMBERED LIST STARTING FROM ZERO
-	// suggestion: use an enum to list states
+	// state - MUST BE ORDERED LIST STARTING FROM ZERO, use enum to list states
 	uint32_t state;
-	// pointer to function to execute at state, null to execute nothing
-	sm_func_t * func;
+	// pointer to function to execute at entry state, 0 to skip
+	sm_func_t * entry_func;
 	// wait time
 	uint32_t wait;
-	// pointer fo test function, returns 1 to move to next state, 0 to remain
-	sm_test_func_t * test_func;
-	// test state - state to jump to if test func returns 1
-	uint32_t test_state;
-	// else next state
+	// next state to transition after wait and all tests below return 0
 	uint32_t next_state;
+	// pointer to function to test at every step, 0 to skip
+	// returning 1 moves during state
+	sm_test_func_t * during_test;
+	uint32_t during_state;
+	// pointer to test function every step, 0 to skip test
+	// returning 1 moves to test during state
+	sm_test_func_t * exit_test;
+	uint32_t exit_state;
 } sm_table_t;
+
+// regex to generate graphviz code:
+//find:
+//\s*\{\s*([^,\s]+)\s*,(?(?=\s*0\s*,)\s*0\s*,|\s*([^,\s]+)\s*,)\s*([^,\s]+)\s*,\s*([^,\s]+)\s*,(?(?=\s*0\s*,)\s*0\s*,|\s*([^,\s]+)\s*,)\s*([^,\s]+)\s*,(?(?=\s*0\s*,)\s*0\s*,|\s*([^,\s]+)\s*,)\s*([^,\s\}]+).*\r?\n
+//replace:
+//"\1" [label="\1 \\n (?2\2\\n:) wait:\3"]\r\n "\1" -> "\4"\r\n(?5 "\1" -> "\6" [color=red label="\5"] \r\n:)(?7 "\1" -> "\8" [color=green label="\7"] \r\n:)
 
 // current state
 typedef struct sm_state_struct {
