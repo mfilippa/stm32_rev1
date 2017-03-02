@@ -37,10 +37,12 @@ uint32_t sm_step(sm_table_t * table, sm_state_t * state){
 		// if tests positive, go to during state
 		if ((*table[curr_state].during_test)()!=0) {
 			sm_set_state(table,state, table[curr_state].during_state);
+			// new state achieved, exit now
+			return state->state;
 		}
 	}
 	// wait for timeout
-	else if (state->wait!=0) {
+	if (state->wait!=0) {
 		state->wait--;
 	}
 	// wait time is over, execute transition
