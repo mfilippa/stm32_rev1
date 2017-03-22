@@ -8,6 +8,11 @@
 // system includes
 #include <stdint.h>
 
+// temperature sensor
+// Temperature (in °C) = {(VSENSE – V25) / Avg_Slope} + 25
+// V25 = 0.76V
+// Avg_Slope = 2.5mV/C
+
 #ifndef MATLAB
 // ADC configuration table
 typedef struct adc_config_struct {
@@ -17,7 +22,7 @@ typedef struct adc_config_struct {
 	uint32_t fast_count[3];
 	// trigger: 1 for pwm, 0 for sw
 	uint32_t fast_pwm_trigger;
-	// slow channel sequence: 0-15
+	// slow channel sequence: 0-15, 16 for temp, 17 for vrefint
 	uint32_t slow_channel[8];
 	// slow channel count, zero to disable
 	uint32_t slow_count;
@@ -44,6 +49,12 @@ void adc_sw_trigger_fast(void);
 
 // force an ADC trigger, slow group
 void adc_sw_trigger_slow(void);
+
+// adc fast handler
+void adc_fast_handler(void);
+
+// adc slow handler
+void adc_slow_handler(void);
 
 // reads the ADC value
 // order: fast_channel[x][x], slow_channel[x]

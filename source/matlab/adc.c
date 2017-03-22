@@ -50,3 +50,24 @@ void adc_sw_trigger_slow(void){
 void adc_sw_trigger_fast(void){
 	adc.fast_handler();
 }
+
+// -----------------------------------------------------------------------------
+// ADC fast handler
+// -----------------------------------------------------------------------------
+void adc_fast_handler(void){
+	// call handler
+	if (adc.fast_handler != 0) {
+		adc.fast_handler();
+	}
+}
+
+// -----------------------------------------------------------------------------
+// ADC slow handler
+// -----------------------------------------------------------------------------
+void adc_slow_handler(void){
+	// call handler
+	if (adc.slow_handler != 0) {
+		adc.slow_handler();
+	}
+}
+

@@ -13,6 +13,7 @@
 
 // ADC channels
 enum adc_channels_enum {
+	// fast channels
 	ADC_FAST_CH1=0,
 	ADC_FAST_CH2,
 	ADC_FAST_CH3,
@@ -23,6 +24,7 @@ enum adc_channels_enum {
 	ADC_FAST_CH8,
 	ADC_FAST_CH9,
 	ADC_FAST_CH10,
+	// slow channels
 	ADC_SLOW_CH1,
 	ADC_SLOW_CH2,
 	ADC_SLOW_CH3,
@@ -30,7 +32,7 @@ enum adc_channels_enum {
 	ADC_SLOW_CH5,
 	ADC_SLOW_CH6,
 	ADC_SLOW_CH7,
-	ADC_SLOW_CH8,
+	ADC_SLOW_TEMP,
 	ADC_CH_COUNT,
 };
 
@@ -43,8 +45,8 @@ adc_config_t adc_config = {
 	{ 4, 3, 3 },
 	// trigger: 1 for pwm, 0 for sw
 	0,
-	// slow channel sequence: 0-15
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	// slow channel sequence: 0-15,16,17
+	{ 0, 1, 2, 3, 4, 5, 6, 16 },
 	// slow channel count, zero to disable
 	8,
 	// trigger: 1 for pwm, 0 for sw
@@ -138,7 +140,13 @@ uint32_t app_init(void) {
 	fb_store_params(FB_SLOW_CH5, 1, 0, INT32_MIN, INT32_MAX);
 	fb_store_params(FB_SLOW_CH6, 1, 0, INT32_MIN, INT32_MAX);
 	fb_store_params(FB_SLOW_CH7, 1, 0, INT32_MIN, INT32_MAX);
-	fb_store_params(FB_SLOW_CH8, 1, 0, INT32_MIN, INT32_MAX);
+	// temperature
+	// scaling = 3.3/4096 * (1<<Q_TEMP)/AVG_SLOPE,
+	// offset = 1/scaling *(V25*(1<<Q_TEMP)/AVG_SLOPE - 25*(1<<Q_TEMP))
+	// AVG_SLOPE = 0.0025, Q_TEMP = 8 (-128C to 128C)
+	// V25 = 0.76
+	fb_store_params(FB_TEMP, 21120, 8, INT32_MIN, INT32_MAX);
+	fb_store_offset(FB_TEMP, 866);
 
 	// register scheduled functions
 	if (sch_function_register(&app_led_blink, 500) == 0) return 1;
@@ -201,7 +209,7 @@ void app_adc_process_slow(void) {
 	fb_process(FB_SLOW_CH5, adc_read(ADC_SLOW_CH5));
 	fb_process(FB_SLOW_CH6, adc_read(ADC_SLOW_CH6));
 	fb_process(FB_SLOW_CH7, adc_read(ADC_SLOW_CH7));
-	fb_process(FB_SLOW_CH8, adc_read(ADC_SLOW_CH8));
+	fb_process(FB_TEMP, adc_read(ADC_SLOW_TEMP));
 }
 
 // -----------------------------------------------------------------------------
@@ -298,7 +306,7 @@ void app_comm_handler(uint32_t rx_size) {
 		comm_write16(fb_get(FB_SLOW_CH5));
 		comm_write16(fb_get(FB_SLOW_CH6));
 		comm_write16(fb_get(FB_SLOW_CH7));
-		comm_write16(fb_get(FB_SLOW_CH8));
+		comm_write16(fb_get(FB_TEMP));
 		break;
 
 	default:

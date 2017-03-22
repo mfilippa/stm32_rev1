@@ -104,6 +104,9 @@ uint32_t adc_init(adc_config_t * config, void (*slow_handler)(void), void (*fast
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 
+	// enable temperature sensor
+	ADC_TempSensorVrefintCmd(ENABLE);
+
 	// FAST PIN CONFIG
 	if (adc.config->fast_count[0] != 0) {
 
@@ -287,15 +290,33 @@ uint32_t adc_read(uint32_t channel) {
 }
 
 // -----------------------------------------------------------------------------
+// ADC fast handler
+// -----------------------------------------------------------------------------
+void adc_fast_handler(void){
+	// call handler
+	if (adc.fast_handler != 0) {
+		adc.fast_handler();
+	}
+}
+
+// -----------------------------------------------------------------------------
+// ADC slow handler
+// -----------------------------------------------------------------------------
+void adc_slow_handler(void){
+	// call handler
+	if (adc.slow_handler != 0) {
+		adc.slow_handler();
+	}
+}
+
+// -----------------------------------------------------------------------------
 // DMA end of transfer irq
 // -----------------------------------------------------------------------------
 void DMA2_Stream0_IRQHandler(void) {
 	// clear flag
 	DMA_ClearITPendingBit(DMA2_Stream0, DMA_IT_TCIF0);
 	// call handler
-	if (adc.slow_handler != 0) {
-		adc.slow_handler();
-	}
+	adc_slow_handler();
 }
 
 // -----------------------------------------------------------------------------
@@ -326,8 +347,6 @@ void ADC_IRQHandler(void) {
 		j++;
 	}
 	// call handler
-	if (adc.fast_handler != 0) {
-		adc.fast_handler();
-	}
+	adc_fast_handler();
 }
 

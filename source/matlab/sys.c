@@ -31,7 +31,7 @@ void sys_reset(void){
 // -----------------------------------------------------------------------------
 // systick handler
 // -----------------------------------------------------------------------------
-void SysTick_Handler(void){
+void sys_tick_handler(void){
 	// call handler
 	if (sys.handler!=0) sys.handler();
 }

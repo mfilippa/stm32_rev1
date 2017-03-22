@@ -13,6 +13,9 @@
 // returns 0 if no error
 int32_t sys_tick_init(uint32_t frequency, void (*handler)(void));
 
+// systick handler
+void sys_tick_handler(void);
+
 // reset: performs a software reset
 void sys_reset(void);
 

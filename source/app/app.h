@@ -18,6 +18,7 @@ enum io_channel_enum {
 
 // feedback channels
 enum fb_channel_enum {
+	// fast channels
 	FB_FAST_CH1=0,
 	FB_FAST_CH2,
 	FB_FAST_CH3,
@@ -28,6 +29,7 @@ enum fb_channel_enum {
 	FB_FAST_CH8,
 	FB_FAST_CH9,
 	FB_FAST_CH10,
+	// slow channels
 	FB_SLOW_CH1,
 	FB_SLOW_CH2,
 	FB_SLOW_CH3,
@@ -35,7 +37,7 @@ enum fb_channel_enum {
 	FB_SLOW_CH5,
 	FB_SLOW_CH6,
 	FB_SLOW_CH7,
-	FB_SLOW_CH8,
+	FB_TEMP,
 	FB_CH_COUNT,
 };
 

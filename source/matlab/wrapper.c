@@ -54,11 +54,11 @@ void wrapper_step(void){
 	}
 
 	// fast process
-//	adc_matlab_fast();
+	adc_fast_handler();
 
 	// slow process
 	if (wrapper.slow_count==0){
-//		adc_matlab_slow();
+		adc_slow_handler();
 		wrapper.slow_count = WRAPPER_SLOW_COUNT;
 	}
 	else {
@@ -67,7 +67,7 @@ void wrapper_step(void){
 
 	// systick process
 	if (wrapper.systick_count==0){
-		SysTick_Handler();
+		sys_tick_handler();
 		wrapper.systick_count = WRAPPER_SYSTICK_COUNT;
 	}
 	else {
