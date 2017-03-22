@@ -10,16 +10,16 @@
 
 // uart interfaces
 typedef enum uart_enum {
-	UART0 = 0,
-	UART1,
-	UART_COUNT
+    UART0 = 0,
+    UART1,
+    UART_COUNT
 } uart_t;
 
 // baud rates
 typedef enum uart_baud_enum {
-	UART_BAUD_9600=0,
-	UART_BAUD_115200,
-	UART_BAUD_COUNT,
+    UART_BAUD_9600=0,
+    UART_BAUD_115200,
+    UART_BAUD_COUNT,
 } uart_baud_t;
 
 // init: initialize module, returns zero if successful

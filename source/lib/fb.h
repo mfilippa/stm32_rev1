@@ -10,14 +10,14 @@
 
 // fb table
 typedef struct fb_table_struct {
-	int32_t raw;				// raw ADC value
-	int32_t offset;				// raw ADC offset
-	int32_t scaling;			// scaling
-	int32_t scaling_q;			// q factor for scaling
-	int32_t value;				// converted value
-	int32_t min;				// min value to check against
-	int32_t max;				// max value to check against
-	int32_t out_of_range;		// out of range flag if value exceeds max/min
+    int32_t raw;                // raw ADC value
+    int32_t offset;                // raw ADC offset
+    int32_t scaling;            // scaling
+    int32_t scaling_q;            // q factor for scaling
+    int32_t value;                // converted value
+    int32_t min;                // min value to check against
+    int32_t max;                // max value to check against
+    int32_t out_of_range;        // out of range flag if value exceeds max/min
 } fb_table_t;
 
 // init: initializes module, returns 0
@@ -25,7 +25,7 @@ uint32_t fb_init(fb_table_t * fb_table, uint32_t tsize);
 
 // store_params: store processing parameters
 void fb_store_params(uint32_t channel, int32_t scaling, int32_t scaling_q,
-		int32_t min, int32_t max);
+        int32_t min, int32_t max);
 
 // get_raw: gets raw ADC value
 uint32_t fb_get_raw(uint32_t channel);

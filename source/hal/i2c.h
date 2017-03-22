@@ -16,11 +16,11 @@ void i2c_step(void);
 
 // write: queues a write to i2c
 void i2c_write(uint32_t address, uint32_t * data, uint32_t nr_bytes,
-		void (*callback)(void));
+        void (*callback)(void));
 
 // read: queues a read from i2c
 void i2c_read(uint32_t address, uint32_t * data, uint32_t nr_bytes,
-		void (*callback)(void));
+        void (*callback)(void));
 
 // get state: gets controller state, zero is IDLE
 uint32_t i2c_get_state(void);

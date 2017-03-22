@@ -9,9 +9,9 @@
 #include "wrapper.h"
 
 // definitions
-#define WRAPPER_FREQUENCY	(10000)
-#define WRAPPER_SLOW_COUNT		3		// WRAPPER_FREQUENCY/(1+N)
-#define WRAPPER_SYSTICK_COUNT	9		// WRAPPER_FREQUENCY/(1+N)
+#define WRAPPER_FREQUENCY    (10000)
+#define WRAPPER_SLOW_COUNT        3        // WRAPPER_FREQUENCY/(1+N)
+#define WRAPPER_SYSTICK_COUNT    9        // WRAPPER_FREQUENCY/(1+N)
 
 // global matlab ports
 const double * pin;
@@ -19,9 +19,9 @@ double * pout;
 
 // module structure
 struct wrapper_struct {
-	uint32_t slow_count;
-	uint32_t systick_count;
-	uint32_t tick;
+    uint32_t slow_count;
+    uint32_t systick_count;
+    uint32_t tick;
 } wrapper;
 
 // -----------------------------------------------------------------------------
@@ -48,37 +48,37 @@ void wrapper_init(const double * m_pin, double * m_pout){
 // -----------------------------------------------------------------------------
 void wrapper_step(void){
 
-	// tick events
-	if (wrapper.tick == 5.0*WRAPPER_FREQUENCY){
+    // tick events
+    if (wrapper.tick == 5.0*WRAPPER_FREQUENCY){
 
-	}
+    }
 
-	// fast process
-	adc_fast_handler();
+    // fast process
+    adc_fast_handler();
 
-	// slow process
-	if (wrapper.slow_count==0){
-		adc_slow_handler();
-		wrapper.slow_count = WRAPPER_SLOW_COUNT;
-	}
-	else {
-		wrapper.slow_count--;
-	}
+    // slow process
+    if (wrapper.slow_count==0){
+        adc_slow_handler();
+        wrapper.slow_count = WRAPPER_SLOW_COUNT;
+    }
+    else {
+        wrapper.slow_count--;
+    }
 
-	// systick process
-	if (wrapper.systick_count==0){
-		sys_tick_handler();
-		wrapper.systick_count = WRAPPER_SYSTICK_COUNT;
-	}
-	else {
-		wrapper.systick_count--;
-	}
+    // systick process
+    if (wrapper.systick_count==0){
+        sys_tick_handler();
+        wrapper.systick_count = WRAPPER_SYSTICK_COUNT;
+    }
+    else {
+        wrapper.systick_count--;
+    }
 
-	// background process
-	app_background();
+    // background process
+    app_background();
 
-	// increment tick
-	wrapper.tick++;
+    // increment tick
+    wrapper.tick++;
 
 }
 

@@ -11,9 +11,9 @@
 #include "hal/uart.h"
 
 // packet definitions
-#define COMM_FRAME_START 		0x3A
-#define COMM_FRAME_END			0x0A
-#define COMM_FRAME_TIMEOUT		20
+#define COMM_FRAME_START         0x3A
+#define COMM_FRAME_END            0x0A
+#define COMM_FRAME_TIMEOUT        20
 
 // comm handler typedef
 typedef void (comm_handler_t)(uint32_t rx_size);
@@ -23,7 +23,7 @@ typedef void (comm_handler_t)(uint32_t rx_size);
 // Requires UART access through HAL and scheduler SCH library
 // Returns 0 if successful
 uint32_t comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
-		uint8_t * tx_buffer, comm_handler_t * handler);
+        uint8_t * tx_buffer, comm_handler_t * handler);
 
 // step: runs communications step, execute in background
 void comm_step(void);

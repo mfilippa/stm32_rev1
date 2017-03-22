@@ -10,8 +10,8 @@
 #include <stdint.h>
 
 // definitions
-#define SCH_NR_TIMERS	64		// max number of timers
-#define SCH_NR_FUNCTIONS 64		// max nr of functions
+#define SCH_NR_TIMERS    64        // max number of timers
+#define SCH_NR_FUNCTIONS 64        // max nr of functions
 
 // init: initializes module, returns zero if successful
 uint32_t sch_init(void);

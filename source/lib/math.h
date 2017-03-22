@@ -9,19 +9,19 @@
 #include <stdint.h>
 
 // degrees to radians in Q format
-#define MATH_DEG_TO_RAD(deg, q) 	\
-	((int32_t)((double)deg/180.0*3.141592653589793*((int32_t)1<<q)))
+#define MATH_DEG_TO_RAD(deg, q)     \
+    ((int32_t)((double)deg/180.0*3.141592653589793*((int32_t)1<<q)))
 
 // macro range check angle
 #define MATH_ANGLE_RANGE_CHECK(angle)\
-	while(angle>=MATH_DEG_TO_RAD(360, 11)) angle-= MATH_DEG_TO_RAD(360, 11); \
-	while(angle<0) angle += MATH_DEG_TO_RAD(360, 11);
+    while(angle>=MATH_DEG_TO_RAD(360, 11)) angle-= MATH_DEG_TO_RAD(360, 11); \
+    while(angle<0) angle += MATH_DEG_TO_RAD(360, 11);
 
 // macro slew rate limiter
 #define MATH_SLR(var, target, step) \
-		if ((var) > (target)+(step)) var -= (step); \
-		else if ((var) < (target)-(step)) var += (step); \
-		else var = target;
+        if ((var) > (target)+(step)) var -= (step); \
+        else if ((var) < (target)-(step)) var += (step); \
+        else var = target;
 
 // macro abs
 #define MATH_ABS(a) (((a) < 0) ? -(a) : (a))
@@ -30,41 +30,41 @@
 // avg is average variable, new is sample to be averaged
 // mem is used as high precision memory, N is weight factor (1/2^N)
 #define MATH_FAST_AVG(avg,new,mem,N) \
-	(mem)= (mem)-((mem)>>N)+(((new)<<16)>>N); \
-	(avg) = (mem)>>16;
+    (mem)= (mem)-((mem)>>N)+(((new)<<16)>>N); \
+    (avg) = (mem)>>16;
 
 // biquad filter struct
 typedef struct math_biquad_struct {
-	int32_t b0;			// b0 coefficient in Q format
-	int32_t b1;			// b1 coefficient in Q format
-	int32_t b2;			// b2 coefficient in Q format
-	int32_t a1;			// a1 coefficient in Q format
-	int32_t a2;			// a2 coefficient in Q format
-	int32_t q;			// Q for filter coefficients
-	int32_t x_z1;		// memory location x(-1)
-	int32_t x_z2;		// memory location x(-2)
-	int32_t y_z1;		// memory location y(-1)
-	int32_t y_z2;		// memory location y(-2)
-	int32_t out;		// output of filter
-	int32_t fraction;	// for fraction saving
+    int32_t b0;            // b0 coefficient in Q format
+    int32_t b1;            // b1 coefficient in Q format
+    int32_t b2;            // b2 coefficient in Q format
+    int32_t a1;            // a1 coefficient in Q format
+    int32_t a2;            // a2 coefficient in Q format
+    int32_t q;            // Q for filter coefficients
+    int32_t x_z1;        // memory location x(-1)
+    int32_t x_z2;        // memory location x(-2)
+    int32_t y_z1;        // memory location y(-1)
+    int32_t y_z2;        // memory location y(-2)
+    int32_t out;        // output of filter
+    int32_t fraction;    // for fraction saving
 } math_biquad_t;
 
 // table lookup struct
 typedef struct math_tlookup_struct {
-	int32_t x;			// x point
-	int32_t y;			// y point
-	int32_t slope;		// slope (y/x) in q format
-	int32_t slope_q;	// q coefficient of slope
+    int32_t x;            // x point
+    int32_t y;            // y point
+    int32_t slope;        // slope (y/x) in q format
+    int32_t slope_q;    // q coefficient of slope
 } math_tlookup_t;
 
 // abcqd0 structure
 typedef struct math_abcqd0_struct{
-	int32_t a;
-	int32_t b;
-	int32_t c;
-	int32_t q;
-	int32_t d;
-	int32_t zero;
+    int32_t a;
+    int32_t b;
+    int32_t c;
+    int32_t q;
+    int32_t d;
+    int32_t zero;
 } math_abcqd0_t;
 
 // sin: sin of angle in q11, returns value in q14

@@ -11,25 +11,25 @@
 #ifdef MATLAB
 // io config table
 typedef struct io_config_struct {
-	// port index (pout or pin): 0-29
-	uint32_t port;
-	// type: 1 for output, 0 for input
-	uint32_t type;
-	// state: to save the state of the pin
-	double state;
+    // port index (pout or pin): 0-29
+    uint32_t port;
+    // type: 1 for output, 0 for input
+    uint32_t type;
+    // state: to save the state of the pin
+    double state;
 } io_config_t;
 #else
 typedef struct io_config_struct {
-	// port: 0-3 for Port A to Port D
-	uint32_t port;
-	// pin: 0-15
-	uint32_t pin;
-	// type: 1 for output, 0 for input
-	uint32_t type;
-	// active high: 1 for active high, 0 for active low
-	uint32_t ah;
-	// initial state: 1 for set, 0 for reset
-	uint32_t state;
+    // port: 0-3 for Port A to Port D
+    uint32_t port;
+    // pin: 0-15
+    uint32_t pin;
+    // type: 1 for output, 0 for input
+    uint32_t type;
+    // active high: 1 for active high, 0 for active low
+    uint32_t ah;
+    // initial state: 1 for set, 0 for reset
+    uint32_t state;
 } io_config_t;
 #endif
 

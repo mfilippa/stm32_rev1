@@ -16,26 +16,26 @@
 #ifndef MATLAB
 // ADC configuration table
 typedef struct adc_config_struct {
-	// fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
-	uint32_t fast_channel[3][4];
-	// fast count: zero to disable, [0] count > [1-2] count
-	uint32_t fast_count[3];
-	// trigger: 1 for pwm, 0 for sw
-	uint32_t fast_pwm_trigger;
-	// slow channel sequence: 0-15, 16 for temp, 17 for vrefint
-	uint32_t slow_channel[8];
-	// slow channel count, zero to disable
-	uint32_t slow_count;
-	// trigger: 1 for pwm, 0 for sw
-	uint32_t slow_pwm_trigger;
+    // fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
+    uint32_t fast_channel[3][4];
+    // fast count: zero to disable, [0] count > [1-2] count
+    uint32_t fast_count[3];
+    // trigger: 1 for pwm, 0 for sw
+    uint32_t fast_pwm_trigger;
+    // slow channel sequence: 0-15, 16 for temp, 17 for vrefint
+    uint32_t slow_channel[8];
+    // slow channel count, zero to disable
+    uint32_t slow_count;
+    // trigger: 1 for pwm, 0 for sw
+    uint32_t slow_pwm_trigger;
 } adc_config_t;
 #else
 // ADC configuration table
 typedef struct adc_config_struct {
-	// port (pin) start index
-	uint32_t pin_start;
-	// nr of channels
-	uint32_t nr_channels;
+    // port (pin) start index
+    uint32_t pin_start;
+    // nr of channels
+    uint32_t nr_channels;
 } adc_config_t;
 #endif
 
