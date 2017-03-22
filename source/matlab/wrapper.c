@@ -39,7 +39,7 @@ void wrapper_init(const double * m_pin, double * m_pout){
     wrapper.tick = 0;
 
     // init
-    if (app_init()!=0) while(1);
+    app_init();
     
 }
 

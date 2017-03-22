@@ -3,9 +3,12 @@
 // -----------------------------------------------------------------------------
 
 // includes
-#include "app.h"
 #include "hal/halinc.h"
 #include "lib/libinc.h"
+#include "app/appinc.h"
+#ifdef MATLAB
+#include "matlab/wrapper.h"
+#endif
 
 // definitions
 #define APP_COMM_BUFFER_SIZE	1024
@@ -36,13 +39,23 @@ enum adc_channels_enum {
 	ADC_CH_COUNT,
 };
 
-#ifndef MATLAB
 // ADC configuration
+#ifdef MATLAB
 adc_config_t adc_config = {
-	// fast channel sequence: 0-15 for [0][n], 0-3 and 10-13 for [1-2][n]
-	{ { 0, 1, 2, 3 }, { 0, 1, 2, 0 }, { 0, 1, 2, 0 } },
-	// fast count: zero to disable, [0] count > [1-2] count
-	{ 4, 3, 3 },
+	// pin start
+	0,
+	// nr of channels
+	ADC_CH_COUNT,
+};
+#else
+adc_config_t adc_config = {
+	// fast channel sequence:
+	// 0-17 for ADC1, 0-3 and 10-13 for ADC2-ADC3
+	{ { 0, 0, 0, 0 },	// ADC1
+	  { 0, 0, 0, 0 }, 	// ADC2
+	  { 0, 0, 0, 0 } }, // ADC3
+	// fast count: zero to disable, ADC1 count > ADC2-ADC3 count
+	{ 0, 0, 0 },
 	// trigger: 1 for pwm, 0 for sw
 	0,
 	// slow channel sequence: 0-15,16,17
@@ -52,26 +65,9 @@ adc_config_t adc_config = {
 	// trigger: 1 for pwm, 0 for sw
 	0,
 };
-#else
-adc_config_t adc_config = {
-	// pin start
-	0,
-	// nr of channels
-	ADC_CH_COUNT,
-};
 #endif
 
-#ifndef MATLAB
-// io config
-io_config_t io_config[3] = {
-	// LED: PC13
-	{2,13,1,1,0},
-	// DEBUG1: C6
-	{2,6,1,1,0},
-	// DEBUG2: C7
-	{2,7,1,1,0},
-};
-#else
+#ifdef MATLAB
 // io config
 io_config_t io_config[3] = {
 	// LED: pout[20]
@@ -80,6 +76,16 @@ io_config_t io_config[3] = {
 	{21,1,0},
 	// DEBUG2: pout[22]
 	{22,1,0},
+};
+#else
+// io config
+io_config_t io_config[3] = {
+	// LED: PC13
+	{2,13,1,1,0},
+	// DEBUG1: C6
+	{2,6,1,1,0},
+	// DEBUG2: C7
+	{2,7,1,1,0},
 };
 #endif
 
@@ -99,6 +105,8 @@ void app_led_blink(void);
 void app_dummy(void);
 void app_comm_handler(uint32_t rx_size);
 void app_adc_trigger(void);
+void app_adc_process_slow(void);
+void app_adc_process_fast(void);
 
 // -----------------------------------------------------------------------------
 // init
