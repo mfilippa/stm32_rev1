@@ -26,13 +26,12 @@
 // macro abs
 #define MATH_ABS(a) (((a) < 0) ? -(a) : (a))
 
-// macro fast low pass filter (IIR filter)
-// AKA exponential moving average
-// implements: out = out - out*weight + in*weight
-// weight needs to be <= 1
+// macro low pass filter (IIR filter) out/in = 1 / (1 + tao s)
+// implements: out(n) = out(n-1) - out(n-1) T/tao + in(n-1) T/tao
+// T is sampling time, tao is filter time constant, T/tao in q14
 // in is input value, out is output of filter, mem is 32b storage
-#define MATH_FAST_LPF(out,in,mem,w) \
-    (mem)= (mem)-((mem>>14)*(w))+((in)*(w)); \
+#define MATH_FAST_LPF(out,in,mem,Ttao) \
+    (mem)= (mem)-((mem>>14)*(Ttao))+((in)*(Ttao)); \
     (out) = (mem)>>14;
 
 // biquad filter struct
