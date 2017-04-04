@@ -26,12 +26,14 @@
 // macro abs
 #define MATH_ABS(a) (((a) < 0) ? -(a) : (a))
 
-// macro weighted average
-// avg is average variable, new is sample to be averaged
-// mem is used as high precision memory, N is weight factor (1/2^N)
-#define MATH_FAST_AVG(avg,new,mem,N) \
-    (mem)= (mem)-((mem)>>N)+(((new)<<16)>>N); \
-    (avg) = (mem)>>16;
+// macro fast low pass filter (IIR filter)
+// AKA exponential moving average
+// implements: out = out - out*weight + in*weight
+// weight needs to be <= 1
+// in is input value, out is output of filter, mem is 32b storage
+#define MATH_FAST_LPF(out,in,mem,w) \
+    (mem)= (mem)-((mem>>14)*(w))+((in)*(w)); \
+    (out) = (mem)>>14;
 
 // biquad filter struct
 typedef struct math_biquad_struct {
