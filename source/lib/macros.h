@@ -14,4 +14,10 @@
 // array size macro
 #define ARRAYSIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
+// store in circular buffer
+#define CIRC_BUFFER_WRITE(value, buffer, index, buffer_size) \
+    buffer[index]=(value);\
+    index++;\
+    if(index>=buffer_size) index=0;
+
 #endif // _MACROS_H_

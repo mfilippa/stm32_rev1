@@ -70,6 +70,16 @@ int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, uint32_t 
 }
 
 // -----------------------------------------------------------------------------
+// fast table look up
+// -----------------------------------------------------------------------------
+int32_t math_fast_table_lookup(int32_t value, const math_tlookup_t * table,
+        uint32_t tsize){
+uint32_t index = (tsize * value)>>14;
+if (index>=tsize) return 0;
+return table[index].y + ((table[index].slope*(value-table[index].x))>>
+                table[index].slope_q);
+}
+// -----------------------------------------------------------------------------
 // biquad filter init
 // -----------------------------------------------------------------------------
 void math_biquad_init(math_biquad_t * filter, int32_t b0, int32_t b1, int32_t b2,
@@ -219,3 +229,22 @@ void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q11){
     abcqd0->c += abcqd0->zero;
 }
 
+//------------------------------------------------------------------------------
+// math exp
+//------------------------------------------------------------------------------
+#define MATH_EXP_TSIZE  10
+math_tlookup_t math_exp_table[MATH_EXP_TSIZE] = {
+        {0,8192,8612,14},
+        {1638,9053,9522,14},
+        {3276,10005,10526,14},
+        {4915,11058,11632,14},
+        {6553,12221,12845,14},
+        {8192,13506,14203,14},
+        {9830,14926,15703,14},
+        {11468,16496,17343,14},
+        {13107,18231,19184,14},
+        {14745,20149,21182,14},
+};
+int32_t math_exp(int32_t value){
+    return math_fast_table_lookup(value, math_exp_table, MATH_EXP_TSIZE);
+}
