@@ -14,5 +14,6 @@
 #include "lib/fb.h"
 #include "lib/math.h"
 #include "lib/sm.h"
+#include "lib/param.h"
 
 #endif // _LIBINC_H_

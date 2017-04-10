@@ -5,6 +5,49 @@
 #ifndef _SM_H_
 #define _SM_H_
 
+/* Usage:
+ *
+ * Enumerate states:
+ * enum states_enum {
+ *     STATE1,
+ *     STATE2,
+ *     STATE3,
+ *     STATE_COUNT,
+ * };
+ *
+ * Prototype entry functions:
+ * sm_func_t fcn1;
+ * sm_func_t fcn2;
+ * sm_func_t fcn3;
+ *
+ * Prototype test functions:
+ * sm_test_func_t test1_during;
+ * sm_test_func_t test2_exit;
+ * sm_test_func_t test3_during;
+ * sm_test_func_t test3_exit;
+ *
+ * Create state machine table:
+ * { state , entry_func , wait , next_state ,
+ *   during_test , during_state , exit_test , exit_state },
+ * sm_table_t sm_table[STATE_COUNT] {
+ *     {STATE1, &fcn1, 100, STATE2,
+ *     &test1_during, STATE3, 0, 0},
+ *     {STATE2, &fcn2, 200, STATE3,
+ *     0, 0, &test2_exit, STATE1},
+ *     {STATE3, &fcn3, 300, STATE1,
+ *     &test3_during, STATE2, &test3_exit, STATE3},
+ * }
+ *
+ * Create state machine variable:
+ * sm_state_t sm;
+ *
+ * Initialize state machine:
+ * sm_init(sm_table, &sm, STATE_COUNT);
+ *
+ * Force a jump to a state:
+ * sm_set_state(sm_table, &sm, STATE2);
+ */
+
 // function to execute at each state
 typedef void (sm_func_t)(void);
 

@@ -52,6 +52,7 @@ typedef struct math_biquad_struct {
 } math_biquad_t;
 
 // table lookup struct
+// NOTE: TABLE MUST BE ORDERED ASCENDING WITH RESPECT TO X
 typedef struct math_tlookup_struct {
     int32_t x;            // x point
     int32_t y;            // y point
