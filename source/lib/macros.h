@@ -20,4 +20,17 @@
     index++;\
     if(index>=buffer_size) index=0;
 
+#define DEBOUNCE(condition, count, limit, state) \
+    if (state==0) { \
+        if(condition) { \
+            if(count<limit) count++; \
+            else state=1; \
+        } else count = 0; \
+    } else { \
+        if(!(condition)) { \
+            if(count>0) count--; \
+            else state=0; \
+        } else count = limit; \
+    }
+
 #endif // _MACROS_H_
