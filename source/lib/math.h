@@ -30,6 +30,7 @@
 // implements: out(n) = out(n-1) - out(n-1) T/tao + in(n-1) T/tao
 // T is sampling time, tao is filter time constant, T/tao in q14
 // in is input value, out is output of filter, mem is 32b storage
+// to match Navg sample average at n tao: T/tao = n/Navg
 // store initial value of mem in Q14!
 #define MATH_FAST_LPF(out,in,mem,Ttao) \
     (mem)= (mem)-((mem>>14)*(Ttao))+((in)*(Ttao)); \
