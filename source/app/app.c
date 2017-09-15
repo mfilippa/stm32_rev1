@@ -118,8 +118,8 @@ uint32_t app_init(void) {
     if (io_init(io_config, IO_CH_COUNT) != 0) return 1;
     if (uart_init(UART0, UART_BAUD_115200) != 0) return 1;
 //    if (uart_init(UART1, UART_BAUD_115200) != 0) return 1;
-    if (adc_init(&adc_config, &app_adc_process_slow, &app_adc_process_fast)
-            != 0) return 1;
+//    if (adc_init(&adc_config, &app_adc_process_slow, &app_adc_process_fast)
+//            != 0) return 1;
 //    if (pwm_init(0) != 0) return 1;
 //    if (i2c_init()!=0) return 1;
 
@@ -128,37 +128,37 @@ uint32_t app_init(void) {
     if (comm_init(UART0, APP_COMM_BUFFER_SIZE, app.rx_buffer,
             app.tx_buffer, &app_comm_handler) != 0) return 1;
     if (debug_init(app.debug_buffer, APP_DEBUG_BUFFER_SIZE) != 0) return 1;
-    if (fb_init(app.fb_table, FB_CH_COUNT) != 0) return 1;
+//    if (fb_init(app.fb_table, FB_CH_COUNT) != 0) return 1;
 
     // initialize feedbacks
-    fb_store_params(FB_FAST_CH1, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH2, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH3, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH4, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH5, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH6, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH7, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH8, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH9, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_FAST_CH10, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH1, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH2, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH3, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH4, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH5, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH6, 1, 0, INT32_MIN, INT32_MAX);
-    fb_store_params(FB_SLOW_CH7, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH1, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH2, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH3, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH4, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH5, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH6, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH7, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH8, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH9, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_FAST_CH10, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH1, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH2, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH3, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH4, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH5, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH6, 1, 0, INT32_MIN, INT32_MAX);
+//    fb_store_params(FB_SLOW_CH7, 1, 0, INT32_MIN, INT32_MAX);
     // temperature
     // scaling = 3.3/4096 * (1<<Q_TEMP)/AVG_SLOPE,
     // offset = 1/scaling *(V25*(1<<Q_TEMP)/AVG_SLOPE - 25*(1<<Q_TEMP))
     // AVG_SLOPE = 0.0025, Q_TEMP = 8 (-128C to 128C)
     // V25 = 0.76
-    fb_store_params(FB_TEMP, 21120, 8, INT32_MIN, INT32_MAX);
-    fb_store_offset(FB_TEMP, 866);
+//    fb_store_params(FB_TEMP, 21120, 8, INT32_MIN, INT32_MAX);
+//    fb_store_offset(FB_TEMP, 866);
 
     // register scheduled functions
     if (sch_function_register(&app_led_blink, 500) == 0) return 1;
-    if (sch_function_register(&app_adc_trigger, 10) == 0) return 1;
+//    if (sch_function_register(&app_adc_trigger, 10) == 0) return 1;
 
     // success
     return 0;
