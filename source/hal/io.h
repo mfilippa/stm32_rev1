@@ -8,17 +8,7 @@
 // system includes
 #include <stdint.h>
 
-#ifdef MATLAB
 // io config table
-typedef struct io_config_struct {
-    // port index (pout or pin): 0-29
-    uint32_t port;
-    // type: 1 for output, 0 for input
-    uint32_t type;
-    // state: to save the state of the pin
-    double state;
-} io_config_t;
-#else
 typedef struct io_config_struct {
     // port: 0-3 for Port A to Port D
     uint32_t port;
@@ -31,7 +21,6 @@ typedef struct io_config_struct {
     // initial state: 1 for set, 0 for reset
     uint32_t state;
 } io_config_t;
-#endif
 
 // init: initializes module, returns 0 if successful
 uint32_t io_init(io_config_t * io_config, uint32_t tsize);

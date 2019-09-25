@@ -6,11 +6,6 @@
 #include "stm32f4xx.h"
 #include "hal/adc.h"
 
-// defines
-#define ADC_MAX_FAST_COUNT    4    // for each ADC(1-3)
-#define ADC_MAX_SLOW_COUNT    8    // total ADC1
-#define ADC_NR_CONVERTERS    3    // ADC1-3
-
 // ADC sample time
 #define ADC_SAMPLE_TIME        ADC_SampleTime_84Cycles
 

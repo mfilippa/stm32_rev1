@@ -18,7 +18,8 @@ GPIO_TypeDef * io_port_map[4] = { GPIOA, GPIOB, GPIOC, GPIOD };
 // pin mapping
 uint16_t io_pin_map[16] = { GPIO_Pin_0, GPIO_Pin_1, GPIO_Pin_2, GPIO_Pin_3,
     GPIO_Pin_4, GPIO_Pin_5, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_8, GPIO_Pin_9,
-    GPIO_Pin_10, GPIO_Pin_11, GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15,
+    GPIO_Pin_10, GPIO_Pin_11, GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, 
+    GPIO_Pin_15,
 };
 
 // -----------------------------------------------------------------------------
@@ -49,11 +50,12 @@ uint32_t io_init(io_config_t * io_config, uint32_t tsize){
     // configure pins
     for (i = 0; i < io.tsize; ++i) {
         gpio.GPIO_Pin = io_pin_map[io.config[i].pin];
+        // input
         if (io.config[i].type==0) {
-            // input
             gpio.GPIO_Mode = GPIO_Mode_IN;
-        } else {
-            // output
+        }
+        // output
+        else {
             gpio.GPIO_Mode = GPIO_Mode_OUT;
         }
         gpio.GPIO_OType = GPIO_OType_PP;
@@ -75,9 +77,11 @@ uint32_t io_init(io_config_t * io_config, uint32_t tsize){
 void io_set(uint32_t channel){
     if (channel<io.tsize) {
         if(io.config[channel].ah==0){
-            io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
+            io_port_map[io.config[channel].port]->BSRRH = 
+                io_pin_map[io.config[channel].pin];
         } else {
-            io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
+            io_port_map[io.config[channel].port]->BSRRL = 
+                io_pin_map[io.config[channel].pin];
         }
     }
 }
@@ -88,9 +92,11 @@ void io_set(uint32_t channel){
 void io_reset(uint32_t channel){
     if (channel<io.tsize) {
         if(io.config[channel].ah==0){
-            io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
+            io_port_map[io.config[channel].port]->BSRRL = 
+                io_pin_map[io.config[channel].pin];
         } else {
-            io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
+            io_port_map[io.config[channel].port]->BSRRH = 
+                io_pin_map[io.config[channel].pin];
         }
     }
 }
@@ -101,12 +107,15 @@ void io_reset(uint32_t channel){
 uint32_t io_toggle(uint32_t channel){
     uint32_t state = 0;
     if (channel<io.tsize) {
-        if (((io_port_map[io.config[channel].port]->ODR) & io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET) {
-            io_port_map[io.config[channel].port]->BSRRH = io_pin_map[io.config[channel].pin];
+        if (((io_port_map[io.config[channel].port]->ODR) & 
+                io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET) {
+            io_port_map[io.config[channel].port]->BSRRH = 
+                io_pin_map[io.config[channel].pin];
             state = 0;
         }
         else {
-            io_port_map[io.config[channel].port]->BSRRL = io_pin_map[io.config[channel].pin];
+            io_port_map[io.config[channel].port]->BSRRL = 
+                io_pin_map[io.config[channel].pin];
             state = 1;
         }
     }
@@ -119,7 +128,8 @@ uint32_t io_toggle(uint32_t channel){
 uint32_t io_read(uint32_t channel){
     uint32_t state = 0;
     if (channel<io.tsize){
-        if ((io_port_map[io.config[channel].port]->IDR & io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET)  {
+        if ((io_port_map[io.config[channel].port]->IDR & 
+            io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET)  {
             state = 1;
         }
         else {
