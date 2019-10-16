@@ -9,7 +9,6 @@
 #include "hal/io.h"
 #include "hal/sys.h"
 #include "hal/uart.h"
-#include "hal/halconfig.h"
 #ifdef MATLAB
 #include "matlab/wrapper.h"
 #endif
@@ -20,8 +19,6 @@
 
 // module structure
 struct {
-    // io configuration
-    io_config_t io[IO_CH_COUNT];
     // comm buffer
     uint8_t rx_buffer[COMM_BUFFER_SIZE];
     uint8_t tx_buffer[COMM_BUFFER_SIZE];
@@ -47,17 +44,7 @@ uint32_t app_init(void) {
     error |= sys_tick_init(SYSTICK_FREQ_HZ, &app_systick);
 
     // init gpio
-    app.io[IO_LED].port = 0; 
-    app.io[IO_LED].pin = 0; 
-    app.io[IO_LED].type = 1; 
-    app.io[IO_LED].ah = 1; 
-    app.io[IO_LED].state = 0;
-    app.io[IO_DEBUG].port = 0; 
-    app.io[IO_DEBUG].pin = 1; 
-    app.io[IO_DEBUG].type = 1; 
-    app.io[IO_DEBUG].ah = 1; 
-    app.io[IO_DEBUG].state = 0;
-    error |= io_init(app.io, IO_CH_COUNT);
+    error |= io_init();
 
     // init scheduler
     error |= sch_init();
@@ -96,7 +83,7 @@ void app_systick(void) {
 // led blink
 // -----------------------------------------------------------------------------
 void app_led_blink(void) {
-    io_toggle(IO_LED);
+    io_toggle(IO_CH_LED);
 }
 
 // -----------------------------------------------------------------------------

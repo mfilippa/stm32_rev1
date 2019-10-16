@@ -1,70 +1,58 @@
 // -----------------------------------------------------------------------------
-// io.c - MPF 01/2017
+// io.c - MPF 10/2019
 // -----------------------------------------------------------------------------
 
 // includes
+#include <stdbool.h>
 #include "stm32f4xx.h"
 #include "hal/io.h"
 
-// module structure
-struct io_struct {
-    io_config_t * config;
-    uint32_t tsize;
-} io;
+// io config table
+typedef struct io_config_struct {
+    // port: GPIOA, GPIOB, GPIOC, GPIOD
+    GPIO_TypeDef * port;
+    // pin: GPIO_Pin_0..15
+    uint16_t pin;
+    // mode: GPIO_Mode_IN / GPIO_Mode_OUT
+    GPIOMode_TypeDef mode;
+    // active high: true for active high, false for active low
+    bool active_high;
+    // initial state: IO_STATE_SET / IO_STATE_RESET
+    io_state_t init_state;
+} io_config_t;
 
-// port mapping
-GPIO_TypeDef * io_port_map[4] = { GPIOA, GPIOB, GPIOC, GPIOD };
-
-// pin mapping
-uint16_t io_pin_map[16] = { GPIO_Pin_0, GPIO_Pin_1, GPIO_Pin_2, GPIO_Pin_3,
-    GPIO_Pin_4, GPIO_Pin_5, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_8, GPIO_Pin_9,
-    GPIO_Pin_10, GPIO_Pin_11, GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, 
-    GPIO_Pin_15,
+// pin configuration
+io_config_t io_config[IO_CH_COUNT] = {
+    // port, pin , mode, active_high, init_state
+    GPIOC, GPIO_Pin_13, GPIO_Mode_OUT, true, IO_STATE_RESET,  // IO_CH_LED
+    GPIOC, GPIO_Pin_14, GPIO_Mode_OUT, true, IO_STATE_RESET,  // IO_CH_DEBUG
 };
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t io_init(io_config_t * io_config, uint32_t tsize){
+uint32_t io_init(void){
 
     GPIO_InitTypeDef gpio;
     uint32_t i;
 
-    // store data
-    io.config = io_config;
-    io.tsize = tsize;
-
-    // range check
-    for (i=0;i<io.tsize;i++){
-        if (io.config[i].port>3) return 1;
-        if (io.config[i].pin>15) return 1;
-    }
-
-    // enable all required peripheral clocks here -----------
+    // enable all required peripheral
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    // ------------------------------------------------------
 
     // configure pins
-    for (i = 0; i < io.tsize; ++i) {
-        gpio.GPIO_Pin = io_pin_map[io.config[i].pin];
-        // input
-        if (io.config[i].type==0) {
-            gpio.GPIO_Mode = GPIO_Mode_IN;
-        }
-        // output
-        else {
-            gpio.GPIO_Mode = GPIO_Mode_OUT;
-        }
+    for (i = 0; i < IO_CH_COUNT; ++i) {
+        gpio.GPIO_Pin = io_config[i].pin;
+        gpio.GPIO_Mode = io_config[i].mode;
         gpio.GPIO_OType = GPIO_OType_PP;
         gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
         gpio.GPIO_Speed = GPIO_High_Speed;
         // initial state
-        if (io.config[i].state==0) io_reset(i);
-        else io_set(i);
-        GPIO_Init(io_port_map[io.config[i].port], &gpio);
+        if (io_config[i].init_state==IO_STATE_RESET) io_reset((io_ch_t)i);
+        else io_set((io_ch_t)i);
+        GPIO_Init(io_config[i].port, &gpio);
     }
 
     // success
@@ -74,50 +62,42 @@ uint32_t io_init(io_config_t * io_config, uint32_t tsize){
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void io_set(uint32_t channel){
-    if (channel<io.tsize) {
-        if(io.config[channel].ah==0){
-            io_port_map[io.config[channel].port]->BSRRH = 
-                io_pin_map[io.config[channel].pin];
-        } else {
-            io_port_map[io.config[channel].port]->BSRRL = 
-                io_pin_map[io.config[channel].pin];
-        }
+void io_set(io_ch_t channel){
+    if(io_config[channel].active_high){
+        io_config[channel].port->BSRRL = io_config[channel].pin;
+    } 
+    else {
+        io_config[channel].port->BSRRH = io_config[channel].pin;
     }
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-void io_reset(uint32_t channel){
-    if (channel<io.tsize) {
-        if(io.config[channel].ah==0){
-            io_port_map[io.config[channel].port]->BSRRL = 
-                io_pin_map[io.config[channel].pin];
-        } else {
-            io_port_map[io.config[channel].port]->BSRRH = 
-                io_pin_map[io.config[channel].pin];
-        }
+void io_reset(io_ch_t channel){
+    if(io_config[channel].active_high){
+        io_config[channel].port->BSRRH = io_config[channel].pin;
+    } 
+    else {
+        io_config[channel].port->BSRRL = io_config[channel].pin;
     }
 }
 
 // -----------------------------------------------------------------------------
 // toggle
 // -----------------------------------------------------------------------------
-uint32_t io_toggle(uint32_t channel){
-    uint32_t state = 0;
-    if (channel<io.tsize) {
-        if (((io_port_map[io.config[channel].port]->ODR) & 
-                io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET) {
-            io_port_map[io.config[channel].port]->BSRRH = 
-                io_pin_map[io.config[channel].pin];
-            state = 0;
-        }
-        else {
-            io_port_map[io.config[channel].port]->BSRRL = 
-                io_pin_map[io.config[channel].pin];
-            state = 1;
-        }
+io_state_t io_toggle(io_ch_t channel){
+    io_state_t state;
+    if (((io_config[channel].port->ODR) & 
+            io_config[channel].pin) != (uint32_t)Bit_RESET) {
+        io_config[channel].port->BSRRH = io_config[channel].pin;
+        if(io_config[channel].active_high) state = IO_STATE_RESET;
+        else state = IO_STATE_SET;
+    }
+    else {
+        io_config[channel].port->BSRRL = io_config[channel].pin;
+        if(io_config[channel].active_high) state = IO_STATE_SET;
+        else state = IO_STATE_RESET;
     }
     return state;
 }
@@ -125,16 +105,16 @@ uint32_t io_toggle(uint32_t channel){
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
-uint32_t io_read(uint32_t channel){
-    uint32_t state = 0;
-    if (channel<io.tsize){
-        if ((io_port_map[io.config[channel].port]->IDR & 
-            io_pin_map[io.config[channel].pin]) != (uint32_t)Bit_RESET)  {
-            state = 1;
-        }
-        else {
-            state = 0;
-        }
+io_state_t io_read(io_ch_t channel){
+    io_state_t state;
+    if ((io_config[channel].port->IDR & 
+        io_config[channel].pin) != (uint32_t)Bit_RESET)  {
+        if(io_config[channel].active_high) state = IO_STATE_SET;
+        else state = IO_STATE_RESET;
+    }
+    else {
+        if(io_config[channel].active_high) state = IO_STATE_RESET;
+        else state = IO_STATE_SET;
     }
     return state;
 }
