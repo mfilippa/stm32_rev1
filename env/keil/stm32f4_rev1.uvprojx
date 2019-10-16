@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>debug</TargetName>
+      <TargetName>stm32</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
@@ -15,9 +15,9 @@
         <TargetCommonOption>
           <Device>STM32F415RGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
-          <PackURL>http://www.keil.com/pack</PackURL>
-          <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <PackID>Keil.STM32F4xx_DFP.2.14.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
+          <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x10000000,0x00010000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000 -FP0($$Device:STM32F415RGTx$CMSIS\Flash\STM32F4xx_1024.FLM))</FlashDriverDll>
@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>stm32f4_rev1</OutputName>
+          <OutputName>stm32_project</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -132,12 +132,12 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
-            <Capability>0</Capability>
-            <DriverSelection>-1</DriverSelection>
+            <Capability>1</Capability>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -191,7 +191,7 @@
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
-            <RwSelD>3</RwSelD>
+            <RwSelD>4</RwSelD>
             <CodeSel>0</CodeSel>
             <OptFeed>0</OptFeed>
             <NoZi1>0</NoZi1>
@@ -310,8 +310,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -322,7 +322,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -333,9 +333,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F40_41xxx USE_STDPERIPH_DRIVER ARM_MATH_CM4, ARM_MATH_MATRIX_CHECK, ARM_MATH_ROUNDING, __FPU_PRESENT = 1</Define>
+              <Define>STM32F40_41xxx USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\source;..\source\hw;..\source\hw\cmsis;..\source\hw\driverlib_v1.8.0\inc</IncludePath>
+              <IncludePath>../../source;../../source/app;../../source/hal;../../source/lib;../../source/hil/stm32;../../source/hil/stm32/cmsis;../../source/hil/stm32/driverlib_v1.8.0/inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -350,14 +350,14 @@
             <useXO>0</useXO>
             <uClangAs>0</uClangAs>
             <VariousControls>
-              <MiscControls>--cpreproc --cpreproc_opts=-D,ARM_MATH_CM4</MiscControls>
-              <Define>ARM_MATH_CM4</Define>
+              <MiscControls></MiscControls>
+              <Define></Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -382,7 +382,7 @@
             <File>
               <FileName>app.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\app\app.c</FilePath>
+              <FilePath>..\..\source\app\app.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -390,84 +390,89 @@
           <GroupName>lib</GroupName>
           <Files>
             <File>
-              <FileName>sch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\lib\sch.c</FilePath>
-            </File>
-            <File>
               <FileName>comm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\lib\comm.c</FilePath>
+              <FilePath>..\..\source\lib\comm.c</FilePath>
             </File>
             <File>
               <FileName>debug.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\lib\debug.c</FilePath>
+              <FilePath>..\..\source\lib\debug.c</FilePath>
             </File>
             <File>
               <FileName>fb.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\lib\fb.c</FilePath>
-            </File>
-            <File>
-              <FileName>sm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\lib\sm.c</FilePath>
+              <FilePath>..\..\source\lib\fb.c</FilePath>
             </File>
             <File>
               <FileName>math.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\lib\math.c</FilePath>
+              <FilePath>..\..\source\lib\math.c</FilePath>
+            </File>
+            <File>
+              <FileName>param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\lib\param.c</FilePath>
+            </File>
+            <File>
+              <FileName>sch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\lib\sch.c</FilePath>
+            </File>
+            <File>
+              <FileName>sm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\lib\sm.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hw</GroupName>
+          <GroupName>hil</GroupName>
           <Files>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\system_stm32f4xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>startup_stm32f40_41xxx.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\source\hw\startup_stm32f40_41xxx.s</FilePath>
-            </File>
-            <File>
-              <FileName>io.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\io.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\sys.c</FilePath>
-            </File>
-            <File>
-              <FileName>uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>pwm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\pwm.c</FilePath>
-            </File>
             <File>
               <FileName>adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\hw\adc.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\adc.c</FilePath>
             </File>
             <File>
               <FileName>i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\hw\i2c.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>io.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\io.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f4xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>startup_stm32f40_41xxx.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\source\hil\stm32\startup_stm32f40_41xxx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -475,49 +480,39 @@
           <GroupName>driverlib</GroupName>
           <Files>
             <File>
-              <FileName>stm32f4xx_rcc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_rcc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_tim.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_adc.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_adc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_dma.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_usart.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\source\hw\driverlib_v1.8.0\src\stm32f4xx_i2c.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_i2c.c</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>cmsis</GroupName>
-          <Files>
             <File>
-              <FileName>arm_cortexM4lf_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\source\hw\cmsis\arm_cortexM4lf_math.lib</FilePath>
+              <FileName>stm32f4xx_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_tim.c</FilePath>
             </File>
           </Files>
         </Group>
