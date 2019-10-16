@@ -37,7 +37,8 @@ typedef struct adc_config_struct {
 // init: intializes the module, return 0 if successful
 // pass function pointers if interrupts are to be generated after
 // a group conversion, or NULL to disable that interrupt
-uint32_t adc_init(adc_config_t * config, void (*slow_handler)(void), void (*fast_handler)(void));
+uint32_t adc_init(adc_config_t * config, 
+    void (*slow_handler)(void), void (*fast_handler)(void));
 
 // force an ADC trigger, fast group
 void adc_sw_trigger_fast(void);

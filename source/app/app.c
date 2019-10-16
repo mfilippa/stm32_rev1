@@ -3,6 +3,7 @@
 // -----------------------------------------------------------------------------
 
 // includes
+#include <stdlib.h>
 #include "app/app.h"
 #include "lib/sch.h"
 #include "lib/comm.h"
@@ -10,18 +11,22 @@
 #include "hal/sys.h"
 #include "hal/uart.h"
 #include "hal/halconfig.h"
+#include "hal/pwm.h"
+#include "hal/adc.h"
 #ifdef MATLAB
 #include "matlab/wrapper.h"
 #endif
 
 // defines
 #define SYSTICK_FREQ_HZ     (1000)
-#define COMM_BUFFER_SIZE    (1000)
+#define COMM_BUFFER_SIZE    (2048)
 
 // module structure
 struct {
     // io configuration
     io_config_t io[IO_CH_COUNT];
+    // adc configuration
+    adc_config_t adc_config;
     // comm buffer
     uint8_t rx_buffer[COMM_BUFFER_SIZE];
     uint8_t tx_buffer[COMM_BUFFER_SIZE];
@@ -32,6 +37,8 @@ void app_led_blink(void);
 void app_comm_handler(uint32_t rx_size);
 void app_systick(void);
 void app_adc_trigger(void);
+void app_adc_process_fast(void);
+void app_adc_process_slow(void);
 
 // -----------------------------------------------------------------------------
 // init
@@ -47,17 +54,30 @@ uint32_t app_init(void) {
     error |= sys_tick_init(SYSTICK_FREQ_HZ, &app_systick);
 
     // init gpio
-    app.io[IO_LED].port = 0; 
-    app.io[IO_LED].pin = 0; 
+    app.io[IO_LED].port = 2;    // PC13
+    app.io[IO_LED].pin = 13;        
     app.io[IO_LED].type = 1; 
     app.io[IO_LED].ah = 1; 
     app.io[IO_LED].state = 0;
-    app.io[IO_DEBUG].port = 0; 
-    app.io[IO_DEBUG].pin = 1; 
+    app.io[IO_DEBUG].port = 2;  // PC14
+    app.io[IO_DEBUG].pin = 14; 
     app.io[IO_DEBUG].type = 1; 
     app.io[IO_DEBUG].ah = 1; 
     app.io[IO_DEBUG].state = 0;
     error |= io_init(app.io, IO_CH_COUNT);
+
+    // init pwm
+    error |= pwm_init(NULL);
+
+    // init adc
+    app.adc_config.fast_channel[0][0]=0;    // ADC0
+    app.adc_config.fast_count[0]=1;         // one fast conversion
+    app.adc_config.fast_count[1]=0;
+    app.adc_config.fast_count[2]=0;
+    app.adc_config.fast_pwm_trigger = 1;
+    app.adc_config.slow_count = 0;
+    app.adc_config.slow_pwm_trigger = 0;
+    error |= adc_init(&app.adc_config, NULL, &app_adc_process_fast);
 
     // init scheduler
     error |= sch_init();
@@ -67,9 +87,6 @@ uint32_t app_init(void) {
     // init comm
     error |= comm_init(UART0, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer,
         &app_comm_handler);
-
-    // if no errors, enable interrupts
-    if (!error) sys_enable_interrupts();
 
     return error;
 }
@@ -120,7 +137,7 @@ void app_adc_process_slow(void) {
 // fast adc
 // -----------------------------------------------------------------------------
 void app_adc_process_fast(void) {
-
+    io_toggle(IO_DEBUG);
 }
 
 // -----------------------------------------------------------------------------

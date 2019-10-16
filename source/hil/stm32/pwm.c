@@ -8,7 +8,7 @@
 #include "lib/macros.h"
 
 // PWM definitions
-#define PWM_FREQUENCY (12000)
+#define PWM_FREQUENCY (25000)
 #define PWM_PERIOD    (SystemCoreClock/PWM_FREQUENCY/2)
 #define PWM_DEADTIME    (148)    // see reference manual on value calculation
 
