@@ -1,43 +1,59 @@
 // -----------------------------------------------------------------------------
-// io.c - MPF 01/2017
+// io.c - MPF - 10/2019
 // -----------------------------------------------------------------------------
 
 // includes
 #include "hal/io.h"
 
+// channel state
+uint32_t io_channel_state[IO_CH_COUNT] = {0, 0};
+
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t io_init(io_config_t * io_config, uint32_t tsize){
-    // success
+uint32_t io_init(void){
+    // nothing to do
     return 0;
 }
 
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void io_set(uint32_t channel){
-
+void io_set(io_ch_t channel){
+    io_channel_state[channel] = 1;
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-void io_reset(uint32_t channel){
-
+void io_reset(io_ch_t channel){
+    io_channel_state[channel] = 0;
 }
 
 // -----------------------------------------------------------------------------
 // toggle
 // -----------------------------------------------------------------------------
-uint32_t io_toggle(uint32_t channel){
-    return 0;
+io_state_t io_toggle(io_ch_t channel){
+    if (io_channel_state[channel]) {
+        io_set(channel);
+        return IO_STATE_SET;
+    } 
+    else {
+        io_reset(channel);
+        return IO_STATE_RESET;
+    }
 }
 
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
-uint32_t io_read(uint32_t channel){
-    return 0;
+io_state_t io_read(io_ch_t channel){
+    // not implemented
+    if (1) {    
+        return IO_STATE_SET;
+    } 
+    else {
+        return IO_STATE_RESET;
+    }
 }
 

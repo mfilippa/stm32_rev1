@@ -8,6 +8,22 @@
 // system includes
 #include <stdint.h>
 
+// ADC channels
+enum adc_channels_enum {
+    // fast channels
+    ADC_FAST_CH1=0,
+    ADC_FAST_CH2,
+    ADC_FAST_CH3,
+    ADC_FAST_CH4,
+    // slow channels
+    ADC_SLOW_CH1,
+    ADC_SLOW_CH2,
+    ADC_SLOW_CH3,
+    ADC_SLOW_CH4,
+    ADC_SLOW_TEMP,
+    ADC_CH_COUNT,
+};
+
 // STM32 internal temperature sensor (channel 16)
 // Temp[degC] = ((VSENSE - V25) / AVG_SLOPE) + 25
 // V25 = 0.76V

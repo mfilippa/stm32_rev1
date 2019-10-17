@@ -10,7 +10,6 @@
 #include "hal/io.h"
 #include "hal/sys.h"
 #include "hal/uart.h"
-#include "hal/halconfig.h"
 #include "hal/pwm.h"
 #include "hal/adc.h"
 #ifdef MATLAB
@@ -23,8 +22,6 @@
 
 // module structure
 struct {
-    // io configuration
-    io_config_t io[IO_CH_COUNT];
     // adc configuration
     adc_config_t adc_config;
     // comm buffer
@@ -54,17 +51,7 @@ uint32_t app_init(void) {
     error |= sys_tick_init(SYSTICK_FREQ_HZ, &app_systick);
 
     // init gpio
-    app.io[IO_LED].port = 2;    // PC13
-    app.io[IO_LED].pin = 13;        
-    app.io[IO_LED].type = 1; 
-    app.io[IO_LED].ah = 1; 
-    app.io[IO_LED].state = 0;
-    app.io[IO_DEBUG].port = 2;  // PC14
-    app.io[IO_DEBUG].pin = 14; 
-    app.io[IO_DEBUG].type = 1; 
-    app.io[IO_DEBUG].ah = 1; 
-    app.io[IO_DEBUG].state = 0;
-    error |= io_init(app.io, IO_CH_COUNT);
+    error |= io_init();
 
     // init pwm
     error |= pwm_init(NULL);
@@ -113,7 +100,7 @@ void app_systick(void) {
 // led blink
 // -----------------------------------------------------------------------------
 void app_led_blink(void) {
-    io_toggle(IO_LED);
+    io_toggle(IO_CH_LED);
 }
 
 // -----------------------------------------------------------------------------
@@ -137,7 +124,7 @@ void app_adc_process_slow(void) {
 // fast adc
 // -----------------------------------------------------------------------------
 void app_adc_process_fast(void) {
-    io_toggle(IO_DEBUG);
+    io_toggle(IO_CH_DEBUG);
 }
 
 // -----------------------------------------------------------------------------
