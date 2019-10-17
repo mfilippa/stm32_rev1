@@ -12,13 +12,15 @@
 #include "hal/uart.h"
 #include "hal/pwm.h"
 #include "hal/adc.h"
+#include "lib/debug.h"
 #ifdef MATLAB
 #include "matlab/wrapper.h"
 #endif
 
 // defines
 #define SYSTICK_FREQ_HZ     (1000)
-#define COMM_BUFFER_SIZE    (2048)
+#define COMM_BUFFER_SIZE    (10000)
+#define DEBUG_BUFFER_SIZE   (1000)
 
 // module structure
 struct {
@@ -27,6 +29,8 @@ struct {
     // comm buffer
     uint8_t rx_buffer[COMM_BUFFER_SIZE];
     uint8_t tx_buffer[COMM_BUFFER_SIZE];
+    // debug buffer
+    debug_t debug_buffer[DEBUG_BUFFER_SIZE];
 } app;
 
 // prototypes
@@ -66,6 +70,9 @@ uint32_t app_init(void) {
     app.adc_config.slow_pwm_trigger = 0;
     error |= adc_init(&app.adc_config, NULL, &app_adc_process_fast);
 
+    // init uart
+    error |= uart_init(UART0, UART_BAUD_115200);
+
     // init scheduler
     error |= sch_init();
     handle = sch_function_register(&app_led_blink,500);
@@ -74,6 +81,11 @@ uint32_t app_init(void) {
     // init comm
     error |= comm_init(UART0, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer,
         &app_comm_handler);
+
+    // init debug
+    error |= debug_init(app.debug_buffer, DEBUG_BUFFER_SIZE);
+    debug_wrap_off();
+    debug_disable();
 
     return error;
 }
@@ -124,7 +136,7 @@ void app_adc_process_slow(void) {
 // fast adc
 // -----------------------------------------------------------------------------
 void app_adc_process_fast(void) {
-    io_toggle(IO_CH_DEBUG);
+    debug_save(adc_read(ADC_FAST_CH1));
 }
 
 // -----------------------------------------------------------------------------
@@ -148,10 +160,14 @@ void app_comm_handler(uint32_t rx_size) {
         }
         break;
     case 0x01:
+        debug_enable();
         break;
     case 0x02:
+        debug_clear();
         break;
-    case 0x03:
+    case 0x03: 
+        for (uint32_t i=0; i<DEBUG_BUFFER_SIZE;i++) 
+            comm_write32(app.debug_buffer[i]);
         break;
     case 0x04:
         break;
@@ -166,6 +182,7 @@ void app_comm_handler(uint32_t rx_size) {
     case 0xD1:
         break;
     case 0xD2:
+        comm_write16(adc_read(ADC_FAST_CH1));
         break;
     case 0xD3:
         break;

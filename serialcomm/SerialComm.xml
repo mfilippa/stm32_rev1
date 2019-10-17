@@ -2,7 +2,7 @@
   <mainwindow height="700" width="850"/>
   <timers query="250" parse="30" />
   <serialport port="COM1" baud="115200" />
-  <protocol packet_size="1024" loop_ms="1" timeout_count="20" log_lines="100" /><!--set timeout to -1 to disable-->
+  <protocol packet_size="10000" loop_ms="1" timeout_count="20" log_lines="100" /><!--set timeout to -1 to disable-->
   <receivefile filename="rxfile" cmd="14.F0.0000.0000"/>
   <sendfile filename="txfile" cmd="14.F0.0000.0000"/>
  <tabcontrol tabname="Debug">
