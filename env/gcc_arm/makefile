@@ -1,0 +1,136 @@
+# ------------------------------------------------------------------------------
+# makefile template - MPF 04/2020
+# ------------------------------------------------------------------------------
+
+# compiler
+# .. add compiler path to $PATH
+# Linux: export PATH=$PATH:/path_to_compiler/bin/
+# Windows: add to path
+CC = arm-none-eabi-gcc
+
+# compiler flags:
+# .. all warnings
+CFLAGS += -Wall
+# .. generate dependency files *.d
+CFLAGS += -MMD -MP
+# .. #define symbols
+CFLAGS += -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER
+# .. paths to search for header files
+CFLAGS += -I../../source
+CFLAGS += -I../../source/hil/stm32
+CFLAGS += -I../../source/hil/stm32/cmsis
+CFLAGS += -I../../source/hil/stm32/driverlib_v1.8.0/inc
+# .. paths to search for source files
+VPATH += ../../source/app
+VPATH += ../../source/lib
+VPATH += ../../source/hil/stm32
+VPATH += ../../source/hil/stm32/gcc_startup
+VPATH += ../../source/hil/stm32/driverlib_v1.8.0/src
+
+# Tools
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
+
+# Core: 0/3/4/7
+CORTEX_M=4
+
+# optimizer options
+# 0: none, 1-3: optimize for speed and size, s: optimize for size (default)
+OPTIMIZE = s
+
+# link time optimizer: lto / no-lto
+# VERY AGRESSIVE OPTIMIZATION... use with caution
+# if using LTO, comment weak IRQ handlers in startup! LTO has a bug (?), 
+# will not override weak definitions
+LTO = lto
+
+# .. arm stuff - edit CORTEX_M to target core
+# extracted from <gcc_arm_compiler>/samples folder
+# USE_NANO=--specs=nano.specs
+USE_SEMIHOST=--specs=rdimon.specs
+USE_NOHOST=--specs=nosys.specs
+CORE=CM$(CORTEX_M)
+ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
+STARTUP_DEFS=-D__STARTUP_CLEAR_BSS -D__START=main
+CFLAGS +=$(ARCH_FLAGS) $(STARTUP_DEFS) -Os -f$(LTO) -O$(OPTIMIZE) -ffunction-sections -fdata-sections
+GC=-Wl,--gc-sections
+MAP=-Wl,-Map=$(OUTDIR)/$(EXEC).map
+LDSCRIPTS=-L. -L./ldscripts -T stm32f415rg.ld
+LFLAGS=$(USE_NANO) $(USE_NOHOST) $(LDSCRIPTS) $(GC) $(MAP)
+
+# linked libraries:
+# .. path to libraries (for non standard libraries)
+# LDFLAGS += -L./
+# .. libraries to link
+#LIBS += -llib
+
+# executable name
+EXEC = debug_$(CORE)
+
+# object folder
+OBJDIR = ./obj
+
+# output folder
+OUTDIR = ./out
+
+# source files
+SRC = app.c \
+	error.c \
+	sch.c \
+	main.c \
+	sys.c \
+	io.c \
+	system_stm32f4xx.c \
+	stm32f4xx_gpio.c \
+	stm32f4xx_rcc.c \
+
+# startup
+ASSY = startup_ARM$(CORE).S
+
+# to execute under windows/linux
+ifdef OS
+	MKDIR = md 
+	RM = del /Q
+	FixPath = $(subst /,\,$1)
+else
+	ifeq ($(shell uname), Linux)
+		MKDIR = mkdir -p 
+		RM = rm -f
+		FixPath = $1
+   endif
+endif
+
+# generate binary and disassembly
+misc : $(OUTDIR)/$(EXEC).axf
+	$(OBJCOPY) -O binary $(OUTDIR)/$(EXEC).axf $(OUTDIR)/$(EXEC).bin
+	$(OBJDUMP) -D $(OUTDIR)/$(EXEC).axf > $(OUTDIR)/$(EXEC).assy
+
+# build target - linker command
+$(OUTDIR)/$(EXEC).axf : $(SRC:%.c=$(OBJDIR)/%.o) $(ASSY:%.S=$(OBJDIR)/%.o)
+	$(MKDIR) $(call FixPath,$(OUTDIR))
+	$(CC) $(CFLAGS) $(LFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+# compile source files
+$(OBJDIR)/%.o : %.c
+	$(MKDIR) $(call FixPath,$(OBJDIR))
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# compile assy files
+$(OBJDIR)/%.o : %.S
+	$(MKDIR) $(call FixPath,$(OBJDIR))
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# auto dependencies - recompile if a header file changed
+-include $(SRC:%.c=$(OBJDIR)/%.d)
+-include $(ASSY:%.S=$(OBJDIR)/%.d)
+
+# clean
+.PHONY: clean 
+clean :
+	$(RM) debug
+	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.o))
+	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.d))
+	$(RM) $(call FixPath,$(ASSY:%.S=$(OBJDIR)/%.o))
+	$(RM) $(call FixPath,$(ASSY:%.S=$(OBJDIR)/%.d))
+
+
