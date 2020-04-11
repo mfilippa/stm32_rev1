@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// sch.h - MPF 01/2013
+// sch.h - MPF 11/2019
 // -----------------------------------------------------------------------------
 
 
@@ -8,13 +8,21 @@
 
 // includes
 #include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 // definitions
 #define SCH_NR_TIMERS    64        // max number of timers
 #define SCH_NR_FUNCTIONS 64        // max nr of functions
 
-// init: initializes module, returns zero if successful
-uint32_t sch_init(void);
+// scheduled function typedef
+typedef void (sch_function_t)(void);
+
+// function handle
+typedef uint32_t sch_handle_t;
+
+// init: initializes module
+void sch_init(void);
 
 // tick: run this at systick, it generates a list of functions to be
 // executed by sch_step()
@@ -25,25 +33,25 @@ void sch_tick(void);
 void sch_step(void);
 
 // function_register: register a function to be scheduled, reload in ticks
-// returns a handle (non-zero) if successful, zero if unable to register function
-// a reload of ZERO disables the function
-uint32_t sch_function_register(void (*function)(void), uint32_t reload);
+// returns the task handle
+// a NULL function pointer disables the function
+sch_handle_t sch_function_register(sch_function_t * function, uint32_t reload);
 
 // function_set_reload: set ticks to execute scheduled function
-// a reload of ZERO disables the function
-void sch_function_set_reload(uint32_t handle, uint32_t reload);
+void sch_function_set_reload(sch_handle_t handle, uint32_t reload);
 
 // function_set: sets a function call to a specific handle
-void sch_function_set(uint32_t handle, void (*function)(void));
+// a NULL function disables this task
+void sch_function_set(sch_handle_t handle, sch_function_t * function);
 
 // timer_register: registers a timer
-// returns a non-zero handle if successful, zero if no timer is available
-uint32_t sch_timer_register(void);
+// returns the timer handle
+sch_handle_t sch_timer_register(void);
 
 // timer_set: sets timer countdown in ticks
-void sch_timer_set(uint32_t handle, uint32_t count);
+void sch_timer_set(sch_handle_t handle, uint32_t count);
 
-// timer_has_expired: returns 1 if timer has expired, zero otherwise
-uint32_t sch_timer_has_expired(uint32_t handle);
+// timer_has_expired: returns true if timer has expired, false otherwise
+bool sch_timer_has_expired(sch_handle_t handle);
 
 #endif // _SCH_H_

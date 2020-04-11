@@ -4,15 +4,28 @@
 
 // includes
 #include "stm32f4xx.h"
-#include "hal/pwm.h"
-#include "lib/macros.h"
+#include "pwm.h"
+#include "macros.h"
+#include "errror.h"
+
+// -----------------------------------------------------------------------------
+// pwm configuration:
+// TMR1: PWMs
+//   PA8      TMR1_CH1     HIN_A
+//   PB13     TMR1_CH1N   /LIN_A
+//   PA9      TMR1_CH2     HIN_B
+//   PB14     TMR1_CH2N   /LIN_B
+//   PA10     TMR1_CH3     HIN_C
+//   PB15     TMR1_CH3N   /LIN_C
+//   PB12     TMR1_BKIN    SD/OC
+// TMR2: ADC timing
 
 // PWM definitions
 #define PWM_FREQUENCY (12000)
 #define PWM_PERIOD    (SystemCoreClock/PWM_FREQUENCY/2)
 #define PWM_DEADTIME    (148)    // see reference manual on value calculation
 
-// comment the following line to map amplitude to CHx
+// comment the following line to map duty to CHx
 #define PWM_AMP_TO_CHxN
 
 // comment the following line for active low
@@ -20,11 +33,15 @@
 #define PWM_CHxN_ACTIVE_HIGH
 #define PWM_BREAK_ACTIVE_HIGH
 
+// PWM hardware fault is enabled/disabled through pwm_init() argument
+
 // slow ADC trigger frequency
 #define PWM_ADC_DIV        2        // ADC_FREQ = PWM_FREQUENCY/(2+PWM_ADC_DIV)
 
 // comment this line to adjust ADC trigger alignment to PWM
 //#define PWM_ADC_TRIGER_SHIFT
+
+// -----------------------------------------------------------------------------
 
 // module structure
 struct pwm_struct {
@@ -34,17 +51,7 @@ struct pwm_struct {
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-uint32_t pwm_init(void (*fault_handler)(void)){
-
-    // configuration:
-    //    PA8        TMR1_CH1    HIN_A
-    //    PB13    TMR1_CH1N    /LIN_A (active low)
-    //    PA9        TMR1_CH2    HIN_B
-    //    PB14    TMR1_CH2N    /LIN_B (active low)
-    //    PA10    TMR1_CH3    HIN_C
-    //    PB15    TMR1_CH3N    /LIN_C (active low)
-    //    PB12    TMR1_BKIN    SD/OC  (active low)
-    //  TMR2 for ADC timing
+void pwm_init(void (*fault_handler)(void)){
 
     GPIO_InitTypeDef GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
@@ -181,43 +188,44 @@ uint32_t pwm_init(void (*fault_handler)(void)){
     TIM_Cmd(TIM1, ENABLE);
     TIM_Cmd(TIM2, ENABLE);
 
-    // success
-    return 0;
-
 }
 
 // -----------------------------------------------------------------------------
 // enable
 // -----------------------------------------------------------------------------
-void pwm_enable(void){
-    // enable break interrupt
-    TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-    TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
-    // enable pwms
-    TIM_CtrlPWMOutputs(TIM1, ENABLE);
+void pwm_enable(pwm_ch_t channel){
+    if (channel==PWM_CH_UVW){
+        // enable break interrupt
+        TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+        TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
+        // enable pwms
+        TIM_CtrlPWMOutputs(TIM1, ENABLE);
+    }
 }
 
 // -----------------------------------------------------------------------------
 // disable
 // -----------------------------------------------------------------------------
-void pwm_disable(void){
-    // disable pwms
-    TIM_CtrlPWMOutputs(TIM1, DISABLE);
-    // disable break interrupt
-    TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
-    TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+void pwm_disable(pwm_ch_t channel){
+    if(channel==PWM_CH_UVW){
+        // disable pwms
+        TIM_CtrlPWMOutputs(TIM1, DISABLE);
+        // disable break interrupt
+        TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
+        TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+    }
 }
 
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void pwm_set(uint32_t * amp){
-    if(amp[0]>F2Q(1,14)) return;
-    if(amp[1]>F2Q(1,14)) return;
-    if(amp[2]>F2Q(1,14)) return;
-    TIM1->CCR1 = (amp[0]*PWM_PERIOD)>>14;            // CCR1 compare register
-    TIM1->CCR2 = (amp[1]*PWM_PERIOD)>>14;            // CCR2 compare register
-    TIM1->CCR3 = (amp[2]*PWM_PERIOD)>>14;            // CCR3 compare register
+void pwm_set_duty_q(pwm_ch_t channel, uint32_t * duty){
+    if(duty[0]>F2Q(1,14)) return;
+    if(duty[1]>F2Q(1,14)) return;
+    if(duty[2]>F2Q(1,14)) return;
+    TIM1->CCR1 = (duty[0]*PWM_PERIOD)>>14;            // CCR1 compare register
+    TIM1->CCR2 = (duty[1]*PWM_PERIOD)>>14;            // CCR2 compare register
+    TIM1->CCR3 = (duty[2]*PWM_PERIOD)>>14;            // CCR3 compare register
 }
 
 // -----------------------------------------------------------------------------

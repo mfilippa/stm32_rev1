@@ -5,6 +5,9 @@
 #ifndef _PARAM_H_
 #define _PARAM_H_
 
+// includes
+#include <stdint.h>
+
 /* Usage:
  *
  * Enumerate parameters:

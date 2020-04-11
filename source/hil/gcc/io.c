@@ -1,43 +1,69 @@
 // -----------------------------------------------------------------------------
-// io.c - MPF 01/2017
+// io.c - MPF - 10/2019
 // -----------------------------------------------------------------------------
 
 // includes
-#include "hal/io.h"
+#include "error.h"
+#include "io.h"
+#include <stdio.h>
+
+// module struct
+struct io_struct {
+    io_state_t ch_state[IO_CH_COUNT];
+} io;
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t io_init(io_config_t * io_config, uint32_t tsize){
-    // success
-    return 0;
+void io_init(void){
+
 }
 
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void io_set(uint32_t channel){
-
+void io_set(io_ch_t channel){
+    if (channel<IO_CH_COUNT) io.ch_state[channel] = IO_STATE_SET;
+    else error_raise(ERROR_IO_ARG);
+    // output to console
+    if(channel==IO_CH_LED) printf("O");
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-void io_reset(uint32_t channel){
-
+void io_reset(io_ch_t channel){
+    if (channel<IO_CH_COUNT) io.ch_state[channel] = IO_STATE_RESET;
+    else error_raise(ERROR_IO_ARG);
+    // output to console
+    if(channel==IO_CH_LED) printf("-");
 }
 
 // -----------------------------------------------------------------------------
 // toggle
 // -----------------------------------------------------------------------------
-uint32_t io_toggle(uint32_t channel){
-    return 0;
+io_state_t io_toggle(io_ch_t channel){
+    io_state_t state = IO_STATE_RESET;
+    if (channel<IO_CH_COUNT) {
+        if (io.ch_state[channel]==IO_STATE_RESET) {
+            io_set(channel);
+            state = IO_STATE_SET;
+        } 
+        else {
+            io_reset(channel);
+            state = IO_STATE_RESET;
+        }
+    }
+    else error_raise(ERROR_IO_ARG);
+    return state;
 }
 
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
-uint32_t io_read(uint32_t channel){
-    return 0;
+io_state_t io_read(io_ch_t channel){
+    io_state_t state = IO_STATE_RESET;
+    if (channel<IO_CH_COUNT) state = io.ch_state[channel];
+    else error_raise(ERROR_IO_ARG);
+    return state;
 }
-

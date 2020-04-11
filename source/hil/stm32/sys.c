@@ -4,7 +4,8 @@
 
 // includes
 #include "stm32f4xx.h"
-#include "hal/sys.h"
+#include "sys.h"
+#include "error.h"
 
 // module structure
 struct sys_struct {
@@ -14,16 +15,14 @@ struct sys_struct {
 // -----------------------------------------------------------------------------
 // systick init
 // -----------------------------------------------------------------------------
-int32_t sys_tick_init(uint32_t frequency, void (*handler)(void)){
+void sys_tick_init(uint32_t frequency, void (*handler)(void)){
 
     // range check frequency
-    if ((frequency<1)||(frequency>1000000)) return 1;
+    if ((frequency<1)||(frequency>1000000)) error_raise(ERROR_SYS_INIT);
     // configure systick
     SysTick_Config(SystemCoreClock / frequency);
     // register handler
     sys.handler = handler;
-    // return with no error
-    return 0;
 }
 
 // -----------------------------------------------------------------------------

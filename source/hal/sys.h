@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// sys.h - MPF 01/2017
+// sys.h - MPF 11/2019
 // -----------------------------------------------------------------------------
 
 #ifndef _SYS_H_
@@ -7,14 +7,11 @@
 
 // includes
 #include <stdint.h>
+#include <stdio.h>
 
-// tick_init: initializes a system timer and calls handler
-// pass a frequency and a handler to call when timer expires, pass NULL to disable
-// returns 0 if no error
-int32_t sys_tick_init(uint32_t frequency, void (*handler)(void));
-
-// systick handler
-void sys_tick_handler(void);
+// tick_init: initializes a system timer
+// pass a handler to call when timer expires, pass NULL to disable
+void sys_tick_init(uint32_t frequency, void (*systick_handler)(void));
 
 // reset: performs a software reset
 void sys_reset(void);

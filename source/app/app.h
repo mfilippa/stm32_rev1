@@ -1,17 +1,17 @@
 // -----------------------------------------------------------------------------
-// app.h - MPF 01/2017
+// app.h - MPF 04/2020
 // -----------------------------------------------------------------------------
 
 #ifndef _APP_H_
 #define _APP_H_
 
-// system includes
+// includes
 #include <stdint.h>
+#include <stdio.h>
 
 
-
-// init: initializes application, returns 0 if successful
-uint32_t app_init(void);
+// init: initializes application
+void app_init(void);
 
 // background: background step
 void app_background(void);

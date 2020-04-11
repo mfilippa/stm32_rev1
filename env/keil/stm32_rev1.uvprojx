@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>stm32</TargetName>
+      <TargetName>stm32f4rg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>stm32_project</OutputName>
+          <OutputName>stm32f4rg</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -395,50 +395,20 @@
               <FilePath>..\..\source\lib\comm.c</FilePath>
             </File>
             <File>
-              <FileName>debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\lib\debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>fb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\lib\fb.c</FilePath>
-            </File>
-            <File>
-              <FileName>math.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\lib\math.c</FilePath>
-            </File>
-            <File>
-              <FileName>param.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\lib\param.c</FilePath>
-            </File>
-            <File>
               <FileName>sch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\source\lib\sch.c</FilePath>
             </File>
             <File>
-              <FileName>sm.c</FileName>
+              <FileName>error.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\lib\sm.c</FilePath>
+              <FilePath>..\..\source\lib\error.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>hil</GroupName>
           <Files>
-            <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\i2c.c</FilePath>
-            </File>
             <File>
               <FileName>io.c</FileName>
               <FileType>1</FileType>
@@ -448,11 +418,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\source\hil\stm32\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>pwm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\pwm.c</FilePath>
             </File>
             <File>
               <FileName>sys.c</FileName>
@@ -472,23 +437,13 @@
             <File>
               <FileName>startup_stm32f40_41xxx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\source\hil\stm32\startup_stm32f40_41xxx.s</FilePath>
+              <FilePath>..\..\source\hil\stm32\keil_startup\startup_stm32f40_41xxx.s</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>driverlib</GroupName>
           <Files>
-            <File>
-              <FileName>stm32f4xx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_dma.c</FilePath>
-            </File>
             <File>
               <FileName>stm32f4xx_gpio.c</FileName>
               <FileType>1</FileType>
@@ -500,19 +455,9 @@
               <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_usart.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_i2c.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_rcc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_rcc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_tim.c</FilePath>
             </File>
           </Files>
         </Group>

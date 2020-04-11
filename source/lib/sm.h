@@ -5,6 +5,9 @@
 #ifndef _SM_H_
 #define _SM_H_
 
+// includes
+#include <stdint.h>
+
 /* Usage:
  *
  * Enumerate states:

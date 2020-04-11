@@ -1,18 +1,14 @@
 // -----------------------------------------------------------------------------
-// app.c - MPF 01/2017
+// app.c - MPF 04/2020
 // -----------------------------------------------------------------------------
 
 // includes
-#include "app/app.h"
-#include "lib/sch.h"
-#include "lib/comm.h"
-#include "hal/io.h"
-#include "hal/sys.h"
-#include "hal/uart.h"
-#include "hal/halconfig.h"
-#ifdef MATLAB
-#include "matlab/wrapper.h"
-#endif
+#include "app.h"
+#include "io.h"
+#include "sys.h"
+#include "uart.h"
+#include "sch.h"
+#include "comm.h"
 
 // defines
 #define SYSTICK_FREQ_HZ     (1000)
@@ -20,8 +16,6 @@
 
 // module structure
 struct {
-    // io configuration
-    io_config_t io[IO_CH_COUNT];
     // comm buffer
     uint8_t rx_buffer[COMM_BUFFER_SIZE];
     uint8_t tx_buffer[COMM_BUFFER_SIZE];
@@ -36,42 +30,29 @@ void app_adc_trigger(void);
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-uint32_t app_init(void) {
-    uint32_t error = 0;
-    uint32_t handle = 0;
+void app_init(void) {
 
     // disable all interrupts
     sys_disable_interrupts();
 
     // init systick
-    error |= sys_tick_init(SYSTICK_FREQ_HZ, &app_systick);
+    sys_tick_init(SYSTICK_FREQ_HZ, &app_systick);
 
-    // init gpio
-    app.io[IO_LED].port = 0; 
-    app.io[IO_LED].pin = 0; 
-    app.io[IO_LED].type = 1; 
-    app.io[IO_LED].ah = 1; 
-    app.io[IO_LED].state = 0;
-    app.io[IO_DEBUG].port = 0; 
-    app.io[IO_DEBUG].pin = 1; 
-    app.io[IO_DEBUG].type = 1; 
-    app.io[IO_DEBUG].ah = 1; 
-    app.io[IO_DEBUG].state = 0;
-    error |= io_init(app.io, IO_CH_COUNT);
+    // init peripherals
+    io_init();
+    uart_init(UART_COMM,UART_BAUD_115200);
 
     // init scheduler
-    error |= sch_init();
-    handle = sch_function_register(&app_led_blink,500);
-    if (handle==0) error = 1;
+    sch_init();
+    sch_function_register(&app_led_blink,500);
 
     // init comm
-    error |= comm_init(UART0, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer,
+    comm_init(UART_COMM, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer,
         &app_comm_handler);
 
-    // if no errors, enable interrupts
-    if (!error) sys_enable_interrupts();
+    // enable interrupts
+    sys_enable_interrupts();
 
-    return error;
 }
 
 // -----------------------------------------------------------------------------
@@ -96,31 +77,7 @@ void app_systick(void) {
 // led blink
 // -----------------------------------------------------------------------------
 void app_led_blink(void) {
-    io_toggle(IO_LED);
-}
-
-// -----------------------------------------------------------------------------
-// adc trigger
-// -----------------------------------------------------------------------------
-void app_adc_trigger(void) {
-    // trigger fast conversion
-    // adc_sw_trigger_fast();
-    // trigger slow conversion
-    // adc_sw_trigger_slow();
-}
-
-// -----------------------------------------------------------------------------
-// slow adc
-// -----------------------------------------------------------------------------
-void app_adc_process_slow(void) {
-
-}
-
-// -----------------------------------------------------------------------------
-// fast adc
-// -----------------------------------------------------------------------------
-void app_adc_process_fast(void) {
-
+    io_toggle(IO_CH_LED);
 }
 
 // -----------------------------------------------------------------------------

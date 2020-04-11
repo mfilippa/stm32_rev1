@@ -1,40 +1,40 @@
 // -----------------------------------------------------------------------------
-// io.h - MPF 01/2017
+// io.h - MPF 11/2019
 // -----------------------------------------------------------------------------
 
 #ifndef _IO_H_
 #define _IO_H_
 
-// system includes
+// includes
 #include <stdint.h>
+#include <stdio.h>
 
-// io config table
-typedef struct io_config_struct {
-    // port: 0-3 for Port A to Port D
-    uint32_t port;
-    // pin: 0-15
-    uint32_t pin;
-    // type: 1 for output, 0 for input
-    uint32_t type;
-    // active high: 1 for active high, 0 for active low
-    uint32_t ah;
-    // initial state: 1 for set, 0 for reset
-    uint32_t state;
-} io_config_t;
+// io channels - do not use physical ifaces, use hw abstracted names
+typedef enum io_channel_enum {
+    IO_CH_LED = 0,           // LED
+    IO_CH_DEBUG,             // DEBUG
+    IO_CH_COUNT,
+} io_ch_t;
 
-// init: initializes module, returns 0 if successful
-uint32_t io_init(io_config_t * io_config, uint32_t tsize);
+// io states
+typedef enum io_states_enum {
+    IO_STATE_RESET = 0,
+    IO_STATE_SET,
+} io_state_t;
 
-// set: sets channel to ACTIVE state
-void io_set(uint32_t channel);
+// init: initializes module
+void io_init(void);
 
-// reset: resets channel to INACTIVE state
-void io_reset(uint32_t channel);
+// set: sets channel
+void io_set(io_ch_t channel);
 
-// toggle: toggles channel, returns current state, ACTIVE as 1, INACTIVE as 0
-uint32_t io_toggle(uint32_t channel);
+// reset: resets channel
+void io_reset(io_ch_t channel);
 
-// read: reads channel, returns current state, ACTIVE as 1, INACTIVE as 0
-uint32_t io_read(uint32_t channel);
+// toggle: toggles channel
+io_state_t io_toggle(io_ch_t channel);
+
+// read: reads channel
+io_state_t io_read(io_ch_t channel);
 
 #endif // _IO_H_

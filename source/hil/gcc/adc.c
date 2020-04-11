@@ -1,60 +1,42 @@
 // -----------------------------------------------------------------------------
-// adc.c - MPF 01/2017
+// adc.c - MPF 11/2019
 // -----------------------------------------------------------------------------
 
 // includes
-#include "hal/adc.h"
+#include "error.h"
+#include "adc.h"
+
+// adc buffers
+uint32_t adc_buffer[ADC_CH_COUNT];
 
 // module structure
 struct adc_struct {
-
+    void (*fast_handler)(void);
+    void (*slow_handler)(void);
 } adc;
 
 // -----------------------------------------------------------------------------
-// initialize
+// init
 // -----------------------------------------------------------------------------
-uint32_t adc_init(adc_config_t * config, void (*slow_handler)(void), 
-    void (*fast_handler)(void)) {
-    // success
-    return 0;
+void adc_init(void (*slow_handler)(void), void (*fast_handler)(void)){ 
+    adc.fast_handler = fast_handler;
+    adc.slow_handler = slow_handler;
+    for (int i=0; i<ADC_CH_COUNT; i++) adc_buffer[i] = 0;
 }
 
 // -----------------------------------------------------------------------------
-// trigger slow
+// sw trigger
 // -----------------------------------------------------------------------------
-void adc_sw_trigger_slow(void) {
-
-}
-
-// -----------------------------------------------------------------------------
-// trigger fast
-// -----------------------------------------------------------------------------
-void adc_sw_trigger_fast(void) {
-
+void adc_sw_trigger(void) {
+    // nothing to do
 }
 
 // -----------------------------------------------------------------------------
 // ADC read
 // -----------------------------------------------------------------------------
 uint32_t adc_read(uint32_t channel) {
-    return 0;
+    uint32_t value = 0;
+    if (channel<ADC_CH_COUNT) value = adc_buffer[channel];
+    else error_raise(ERROR_ADC_ARG);
+    return value;
 }
-
-// -----------------------------------------------------------------------------
-// ADC fast handler
-// -----------------------------------------------------------------------------
-void adc_fast_handler(void){
-    // call handler
-
-}
-
-// -----------------------------------------------------------------------------
-// ADC slow handler
-// -----------------------------------------------------------------------------
-void adc_slow_handler(void){
-    // call handler
-
-}
-
-
-

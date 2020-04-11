@@ -4,7 +4,7 @@
 
 
 // includes
-#include "libinc.h"
+#include "debug.h"
 
 // debug vars
 uint32_t out1, out2, out3;

@@ -13,7 +13,9 @@ CFLAGS += -MMD -MP
 # .. #define symbols
 CFLAGS += -DSYMBOL
 # .. paths to search for header files
-CFLAGS += -I../../source/
+CFLAGS += -I../../source/app
+CFLAGS += -I../../source/hal
+CFLAGS += -I../../source/lib
 
 # .. paths to search for source files
 VPATH += ../../source/app
@@ -37,22 +39,22 @@ SRC = app.c \
 	sch.c \
 	comm.c \
 	main.c \
-	adc.c \
-	i2c.c \
 	io.c \
-	pwm.c \
 	sys.c \
 	uart.c \
+	error.c
 
 # to execute under windows/linux
 ifdef OS
 	FixPath = $(subst /,\,$1)
 	MKDIR = if not exist $(call FixPath,$(OBJDIR)) mkdir $(call FixPath,$(OBJDIR)) 
 	RM = del /Q
+	EXT = .exe
 else
 	ifeq ($(shell uname), Linux)
 		MKDIR = mkdir -p $(OBJDIR)
 		RM = rm -f
+		FixPath = $1
    endif
 endif
 
@@ -71,7 +73,7 @@ $(OBJDIR)/%.o : %.c
 # clean
 .PHONY: clean 
 clean :
-	$(RM) debug
+	$(RM) $(EXEC)$(EXT)
 	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.o))
 	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.d))
 

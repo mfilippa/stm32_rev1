@@ -16,7 +16,9 @@ CFLAGS += -MMD -MP
 # .. #define symbols
 CFLAGS += -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER
 # .. paths to search for header files
-CFLAGS += -I../../source
+CFLAGS += -I../../source/app
+CFLAGS += -I../../source/hal
+CFLAGS += -I../../source/lib
 CFLAGS += -I../../source/hil/stm32
 CFLAGS += -I../../source/hil/stm32/cmsis
 CFLAGS += -I../../source/hil/stm32/driverlib_v1.8.0/inc
@@ -75,13 +77,16 @@ OUTDIR = ./out
 
 # source files
 SRC = app.c \
-	error.c \
 	sch.c \
+	comm.c \
 	main.c \
-	sys.c \
 	io.c \
+	sys.c \
+	uart.c \
+	error.c \
 	system_stm32f4xx.c \
 	stm32f4xx_gpio.c \
+	stm32f4xx_usart.c \
 	stm32f4xx_rcc.c \
 
 # startup
@@ -89,12 +94,13 @@ ASSY = startup_ARM$(CORE).S
 
 # to execute under windows/linux
 ifdef OS
-	MKDIR = md 
-	RM = del /Q
 	FixPath = $(subst /,\,$1)
+	MKDIR = if not exist $(call FixPath,$(OBJDIR)) mkdir $(call FixPath,$(OBJDIR)) 
+	RM = del /Q
+	EXT = .exe
 else
 	ifeq ($(shell uname), Linux)
-		MKDIR = mkdir -p 
+		MKDIR = mkdir -p $(OBJDIR)
 		RM = rm -f
 		FixPath = $1
    endif
@@ -127,7 +133,7 @@ $(OBJDIR)/%.o : %.S
 # clean
 .PHONY: clean 
 clean :
-	$(RM) debug
+	$(RM) $(EXEC)$(EXT)
 	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.o))
 	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.d))
 	$(RM) $(call FixPath,$(ASSY:%.S=$(OBJDIR)/%.o))

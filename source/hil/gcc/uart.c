@@ -1,40 +1,52 @@
 // -----------------------------------------------------------------------------
-// uart.c - MPF - 10/2013
+// uart.c - MPF - 11/2019
 // -----------------------------------------------------------------------------
 
 // includes
-#include "hal/uart.h"
+#include "uart.h"
+#include "error.h"
+
+// module struct
+struct uart_struct {
+    uart_baud_t baud[UART_COUNT];
+} uart;
 
 // -----------------------------------------------------------------------------
-// initialize
+// init
 // -----------------------------------------------------------------------------
-uint32_t uart_init(uart_t uart, uart_baud_t baud_rate){
-    return 0;
+void uart_init(uart_t uart_iface, uart_baud_t baud_rate){
+    if((uart_iface<UART_COUNT)&&(baud_rate<UART_BAUD_COUNT)){
+        uart.baud[uart_iface] = baud_rate;
+    }
+    else error_raise(ERROR_UART_INIT);
 }
 
 // -----------------------------------------------------------------------------
 // write
 // -----------------------------------------------------------------------------
-void uart_write(uart_t uart, uint32_t data){
-
+void uart_write(uart_t uart_iface, uint32_t data){
+    // nothing to do
 }
 
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
-uint32_t uart_read(uart_t uart){
+uint32_t uart_read(uart_t uart_iface){
+    // nothing to do
     return 0;
 }
 // -----------------------------------------------------------------------------
 // write ready
 // -----------------------------------------------------------------------------
-uint32_t uart_write_ready(uart_t uart){
-    return 0;
+bool uart_write_ready(uart_t uart_iface){
+    // nothing to do
+    return false;
 }
 
 // -----------------------------------------------------------------------------
 // read ready
 // -----------------------------------------------------------------------------
-uint32_t uart_read_ready(uart_t uart){
-    return 0;
+bool uart_read_ready(uart_t uart){
+    // nothing to do
+    return false;
 }

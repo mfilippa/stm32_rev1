@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------------------
-// SerialComm 3.0 - MPF 01/2017
+// SerialComm 3.0 - MPF 11/2019
 // -----------------------------------------------------------------------------
 
 
 // includes
-#include "hal/uart.h"
+#include "error.h"
 #include "comm.h"
 #include "sch.h"
 
@@ -62,10 +62,10 @@ uint32_t comm_byte_to_ascii_low(uint32_t value);
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
+void comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
         uint8_t * tx_buffer, comm_handler_t * handler){
     // save uart
-    if (uart>=UART_COUNT) return 1;
+    if (uart>=UART_COUNT) error_raise(ERROR_COMM_INIT);
     else comm.uart = uart;
     // save buffer data
     comm.buffer_size = buffer_size;
@@ -75,11 +75,9 @@ uint32_t comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
     comm.handler = handler;
     // get a timer handle
     comm.sch_timer_handle = sch_timer_register();
-    if(comm.sch_timer_handle==0) return 1;
+    if(comm.sch_timer_handle==0) error_raise(ERROR_COMM_INIT);
     // init state machine
     comm.state = COMM_STATE_IDLE;
-    // success
-    return 0;
 }
 
 // -----------------------------------------------------------------------------

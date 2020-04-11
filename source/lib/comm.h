@@ -1,28 +1,29 @@
 // -----------------------------------------------------------------------------
-// SerialComm 3.0 - MPF 01/2017
+// SerialComm 3.0 - MPF 11/2019
 // -----------------------------------------------------------------------------
-
+// Hex coded ascii comm protocol. Message structure:
+//   <START_CHAR><DATA...><END_CHAR>
+// Requires UART access through HAL and scheduler SCH library
+// -----------------------------------------------------------------------------
 
 #ifndef _COMM_H_
 #define _COMM_H_
 
 // includes
 #include <stdint.h>
-#include "hal/uart.h"
+#include "uart.h"
 
 // packet definitions
-#define COMM_FRAME_START         0x3A
-#define COMM_FRAME_END            0x0A
-#define COMM_FRAME_TIMEOUT        20
+#define COMM_FRAME_START          0x3A      // ':'
+#define COMM_FRAME_END            0x0A      // '\n'
+#define COMM_FRAME_TIMEOUT        20        // ticks, zero to disable
 
 // comm handler typedef
 typedef void (comm_handler_t)(uint32_t rx_size);
 
 // init: initializes module. Buffers are passed to this module by pointers
-// A handler is called after a message is received
-// Requires UART access through HAL and scheduler SCH library
-// Returns 0 if successful
-uint32_t comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
+// a handler is called after a message is received
+void comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
         uint8_t * tx_buffer, comm_handler_t * handler);
 
 // step: runs communications step, execute in background
