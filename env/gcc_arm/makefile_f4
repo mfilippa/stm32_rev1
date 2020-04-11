@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# makefile template - MPF 04/2020
+# makefile - MPF 04/2020
 # ------------------------------------------------------------------------------
 
 # compiler
@@ -19,15 +19,15 @@ CFLAGS += -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER
 CFLAGS += -I../../source/app
 CFLAGS += -I../../source/hal
 CFLAGS += -I../../source/lib
-CFLAGS += -I../../source/hil/stm32
 CFLAGS += -I../../source/hil/stm32/cmsis
-CFLAGS += -I../../source/hil/stm32/driverlib_v1.8.0/inc
+CFLAGS += -I../../source/hil/stm32/stm32f4
+CFLAGS += -I../../source/hil/stm32/driverlib_stm32f4_v1.8.0/inc
 # .. paths to search for source files
 VPATH += ../../source/app
 VPATH += ../../source/lib
-VPATH += ../../source/hil/stm32
+VPATH += ../../source/hil/stm32/stm32f4
 VPATH += ../../source/hil/stm32/gcc_startup
-VPATH += ../../source/hil/stm32/driverlib_v1.8.0/src
+VPATH += ../../source/hil/stm32/driverlib_stm32f4_v1.8.0/src
 
 # Tools
 OBJCOPY = arm-none-eabi-objcopy
@@ -103,7 +103,7 @@ else
 		MKDIR = mkdir -p $(OBJDIR)
 		RM = rm -f
 		FixPath = $1
-   endif
+	endif
 endif
 
 # generate binary and disassembly
@@ -113,17 +113,17 @@ misc : $(OUTDIR)/$(EXEC).axf
 
 # build target - linker command
 $(OUTDIR)/$(EXEC).axf : $(SRC:%.c=$(OBJDIR)/%.o) $(ASSY:%.S=$(OBJDIR)/%.o)
-	$(MKDIR) $(call FixPath,$(OUTDIR))
+	$(MKDIR)
 	$(CC) $(CFLAGS) $(LFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 # compile source files
 $(OBJDIR)/%.o : %.c
-	$(MKDIR) $(call FixPath,$(OBJDIR))
+	$(MKDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # compile assy files
 $(OBJDIR)/%.o : %.S
-	$(MKDIR) $(call FixPath,$(OBJDIR))
+	$(MKDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # auto dependencies - recompile if a header file changed
@@ -133,10 +133,5 @@ $(OBJDIR)/%.o : %.S
 # clean
 .PHONY: clean 
 clean :
-	$(RM) $(EXEC)$(EXT)
-	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.o))
-	$(RM) $(call FixPath,$(SRC:%.c=$(OBJDIR)/%.d))
-	$(RM) $(call FixPath,$(ASSY:%.S=$(OBJDIR)/%.o))
-	$(RM) $(call FixPath,$(ASSY:%.S=$(OBJDIR)/%.d))
-
-
+	$(RM) $(call FixPath,$(OBJDIR)/*)
+	$(RM) $(call FixPath,$(OUTDIR)/*)

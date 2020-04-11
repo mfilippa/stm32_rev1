@@ -87,7 +87,49 @@ __isr_vector:
 	.long	SysTick_Handler       /* SysTick Handler */
 
 	/* External interrupts */
-	.long	Default_Handler
+	.long	WWDG_IRQHandler            /* Window Watchdog */
+	.long	PVD_IRQHandler             /* PVD through EXTI Line detect */
+	.long	TAMPER_IRQHandler          /* Tamper */
+	.long	RTC_IRQHandler             /* RTC */
+	.long	FLASH_IRQHandler           /* Flash */
+	.long	RCC_IRQHandler             /* RCC */
+	.long	EXTI0_IRQHandler           /* EXTI Line 0 */
+	.long	EXTI1_IRQHandler           /* EXTI Line 1 */
+	.long	EXTI2_IRQHandler           /* EXTI Line 2 */
+	.long	EXTI3_IRQHandler           /* EXTI Line 3 */
+	.long	EXTI4_IRQHandler           /* EXTI Line 4 */
+	.long	DMA1_Channel1_IRQHandler   /* DMA1 Channel 1 */
+	.long	DMA1_Channel2_IRQHandler   /* DMA1 Channel 2 */
+	.long	DMA1_Channel3_IRQHandler   /* DMA1 Channel 3 */
+	.long	DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
+	.long	DMA1_Channel5_IRQHandler   /* DMA1 Channel 5 */
+	.long	DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
+	.long	DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
+	.long	ADC1_2_IRQHandler          /* ADC1_2 */
+	.long	USB_HP_CAN1_TX_IRQHandler  /* USB High Priority or CAN1 TX */
+	.long	USB_LP_CAN1_RX0_IRQHandler /* USB Low  Priority or CAN1 RX0 */
+	.long	CAN1_RX1_IRQHandler        /* CAN1 RX1 */
+	.long	CAN1_SCE_IRQHandler        /* CAN1 SCE */
+	.long	EXTI9_5_IRQHandler         /* EXTI Line 9..5 */
+	.long	TIM1_BRK_IRQHandler        /* TIM1 Break */
+	.long	TIM1_UP_IRQHandler         /* TIM1 Update */
+	.long	TIM1_TRG_COM_IRQHandler    /* TIM1 Trigger and Commutation */
+	.long	TIM1_CC_IRQHandler         /* TIM1 Capture Compare */
+	.long	TIM2_IRQHandler            /* TIM2 */
+	.long	TIM3_IRQHandler            /* TIM3 */
+	.long	TIM4_IRQHandler            /* TIM4 */
+	.long	I2C1_EV_IRQHandler         /* I2C1 Event */
+	.long	I2C1_ER_IRQHandler         /* I2C1 Error */
+	.long	I2C2_EV_IRQHandler         /* I2C2 Event */
+	.long	I2C2_ER_IRQHandler         /* I2C2 Error */
+	.long	SPI1_IRQHandler            /* SPI1 */
+	.long	SPI2_IRQHandler            /* SPI2 */
+	.long	USART1_IRQHandler          /* USART1 */
+	.long	USART2_IRQHandler          /* USART2 */
+	.long	USART3_IRQHandler          /* USART3 */
+	.long	EXTI15_10_IRQHandler       /* EXTI Line 15..10 */
+	.long	RTCAlarm_IRQHandler        /* RTC Alarm through EXTI Line */
+	.long	USBWakeUp_IRQHandler       /* USB Wakeup from suspend */
 
 	.size	__isr_vector, . - __isr_vector
 
@@ -251,7 +293,52 @@ Default_Handler:
 	def_irq_handler	SVC_Handler
 	def_irq_handler	DebugMon_Handler
 	def_irq_handler	PendSV_Handler
-	def_irq_handler	SysTick_Handler
+	/*def_irq_handler	SysTick_Handler*/
 	def_irq_handler	DEF_IRQHandler
+
+	/* External interrupts */
+	def_irq_handler WWDG_IRQHandler            /* Window Watchdog */
+	def_irq_handler PVD_IRQHandler             /* PVD through EXTI Line detect */
+	def_irq_handler TAMPER_IRQHandler          /* Tamper */
+	def_irq_handler RTC_IRQHandler             /* RTC */
+	def_irq_handler FLASH_IRQHandler           /* Flash */
+	def_irq_handler RCC_IRQHandler             /* RCC */
+	def_irq_handler EXTI0_IRQHandler           /* EXTI Line 0 */
+	def_irq_handler EXTI1_IRQHandler           /* EXTI Line 1 */
+	def_irq_handler EXTI2_IRQHandler           /* EXTI Line 2 */
+	def_irq_handler EXTI3_IRQHandler           /* EXTI Line 3 */
+	def_irq_handler EXTI4_IRQHandler           /* EXTI Line 4 */
+	def_irq_handler DMA1_Channel1_IRQHandler   /* DMA1 Channel 1 */
+	def_irq_handler DMA1_Channel2_IRQHandler   /* DMA1 Channel 2 */
+	def_irq_handler DMA1_Channel3_IRQHandler   /* DMA1 Channel 3 */
+	def_irq_handler DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
+	def_irq_handler DMA1_Channel5_IRQHandler   /* DMA1 Channel 5 */
+	def_irq_handler DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
+	def_irq_handler DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
+	def_irq_handler ADC1_2_IRQHandler          /* ADC1_2 */
+	def_irq_handler USB_HP_CAN1_TX_IRQHandler  /* USB High Priority or CAN1 TX */
+	def_irq_handler USB_LP_CAN1_RX0_IRQHandler /* USB Low  Priority or CAN1 RX0 */
+	def_irq_handler CAN1_RX1_IRQHandler        /* CAN1 RX1 */
+	def_irq_handler CAN1_SCE_IRQHandler        /* CAN1 SCE */
+	def_irq_handler EXTI9_5_IRQHandler         /* EXTI Line 9..5 */
+	def_irq_handler TIM1_BRK_IRQHandler        /* TIM1 Break */
+	def_irq_handler TIM1_UP_IRQHandler         /* TIM1 Update */
+	def_irq_handler TIM1_TRG_COM_IRQHandler    /* TIM1 Trigger and Commutation */
+	def_irq_handler TIM1_CC_IRQHandler         /* TIM1 Capture Compare */
+	def_irq_handler TIM2_IRQHandler            /* TIM2 */
+	def_irq_handler TIM3_IRQHandler            /* TIM3 */
+	def_irq_handler TIM4_IRQHandler            /* TIM4 */
+	def_irq_handler I2C1_EV_IRQHandler         /* I2C1 Event */
+	def_irq_handler I2C1_ER_IRQHandler         /* I2C1 Error */
+	def_irq_handler I2C2_EV_IRQHandler         /* I2C2 Event */
+	def_irq_handler I2C2_ER_IRQHandler         /* I2C2 Error */
+	def_irq_handler SPI1_IRQHandler            /* SPI1 */
+	def_irq_handler SPI2_IRQHandler            /* SPI2 */
+	def_irq_handler USART1_IRQHandler          /* USART1 */
+	def_irq_handler USART2_IRQHandler          /* USART2 */
+	def_irq_handler USART3_IRQHandler          /* USART3 */
+	def_irq_handler EXTI15_10_IRQHandler       /* EXTI Line 15..10 */
+	def_irq_handler RTCAlarm_IRQHandler        /* RTC Alarm through EXTI Line */
+	def_irq_handler USBWakeUp_IRQHandler       /* USB Wakeup from suspend */
 
 	.end

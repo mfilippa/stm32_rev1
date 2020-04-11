@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>../../source;../../source/app;../../source/hal;../../source/lib;../../source/hil/stm32;../../source/hil/stm32/cmsis;../../source/hil/stm32/driverlib_v1.8.0/inc</IncludePath>
+              <IncludePath>../../source/app;../../source/lib;../../source/hal;../../source/hil/stm32/cmsis;../../source/hil/stm32/stm32f4;../../source/hil/stm32/driverlib_stm32f4_v1.8.0/inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -412,27 +412,27 @@
             <File>
               <FileName>io.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\io.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\stm32f4\io.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\main.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\stm32f4\main.c</FilePath>
             </File>
             <File>
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\sys.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\stm32f4\sys.c</FilePath>
             </File>
             <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\system_stm32f4xx.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\stm32f4\system_stm32f4xx.c</FilePath>
             </File>
             <File>
               <FileName>uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\uart.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\stm32f4\uart.c</FilePath>
             </File>
             <File>
               <FileName>startup_stm32f40_41xxx.s</FileName>
@@ -447,17 +447,17 @@
             <File>
               <FileName>stm32f4xx_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_usart.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\driverlib_stm32f4_v1.8.0\src\stm32f4xx_gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\source\hil\stm32\driverlib_v1.8.0\src\stm32f4xx_rcc.c</FilePath>
+              <FilePath>..\..\source\hil\stm32\driverlib_stm32f4_v1.8.0\src\stm32f4xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\source\hil\stm32\driverlib_stm32f4_v1.8.0\src\stm32f4xx_usart.c</FilePath>
             </File>
           </Files>
         </Group>
