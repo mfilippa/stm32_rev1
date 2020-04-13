@@ -86,3 +86,6 @@ Where files come from:
   > ldscripts/*  - using nokeep.ld (minimum size binary)
   > startup/*
   > makefile
+
+## Setting up the micro
+- Adjust HSE_VALUE definition in stm32f4xx.h and stm32f10x.h

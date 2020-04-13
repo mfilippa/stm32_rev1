@@ -40,26 +40,11 @@ void uart_init(uart_t uart, uart_baud_t baud_rate){
     if (!IS_GPIO_PIN(uart_cfg[uart].rx_pin)) error_raise(ERROR_UART_INIT);
     if (!IS_GPIO_PIN(uart_cfg[uart].tx_pin)) error_raise(ERROR_UART_INIT);
 
-    // enable gpio clocks - also check GPIOx
-    if (uart_cfg[uart].rx_port==GPIOA) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    else if (uart_cfg[uart].rx_port==GPIOB) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    else if (uart_cfg[uart].rx_port==GPIOC) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-    else if (uart_cfg[uart].rx_port==GPIOD) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    else error_raise(ERROR_UART_INIT);
-
-    if (uart_cfg[uart].tx_port==GPIOA) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    else if (uart_cfg[uart].tx_port==GPIOB) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    else if (uart_cfg[uart].tx_port==GPIOC) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-    else if (uart_cfg[uart].tx_port==GPIOD) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    else error_raise(ERROR_UART_INIT);
+    // enable all peripherals
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
     // enable uart clocks - also range check UART
     if (uart_cfg[uart].uart==USART1) 

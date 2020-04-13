@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 
 // includes
-#include "stm32f4xx.h"
+#include "stm32f10x.h"
 #include "sys.h"
 #include "error.h"
 

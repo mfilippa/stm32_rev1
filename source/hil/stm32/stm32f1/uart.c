@@ -5,11 +5,11 @@
 // includes
 #include "error.h"
 #include "uart.h"
-#include "stm32f4xx.h"
+#include "stm32f10x.h"
 
 // uart config table
 typedef struct uart_config_struct {
-    USART_TypeDef * uart;       // uart: USART1,2,3,6 / UART4,5
+    USART_TypeDef * uart;       // uart: USART1,2,3
     GPIO_TypeDef * rx_port;     // port: GPIOA..D
     uint16_t rx_pin;            // pin: GPIO_Pin_0..15
     GPIO_TypeDef * tx_port;     // port: GPIOA..D
@@ -31,8 +31,6 @@ void uart_init(uart_t uart, uart_baud_t baud_rate){
 
     GPIO_InitTypeDef gpio;
     USART_InitTypeDef uartdef;
-    uint8_t GPIO_AF;
-    uint8_t GPIO_PinSource;
 
     // check args and pins - ports and uarts are checked at init functions
     if (baud_rate>=UART_BAUD_COUNT) error_raise(ERROR_UART_INIT);
@@ -40,65 +38,36 @@ void uart_init(uart_t uart, uart_baud_t baud_rate){
     if (!IS_GPIO_PIN(uart_cfg[uart].rx_pin)) error_raise(ERROR_UART_INIT);
     if (!IS_GPIO_PIN(uart_cfg[uart].tx_pin)) error_raise(ERROR_UART_INIT);
 
-    // enable gpio clocks - also check GPIOx
-    if (uart_cfg[uart].rx_port==GPIOA) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    else if (uart_cfg[uart].rx_port==GPIOB) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    else if (uart_cfg[uart].rx_port==GPIOC) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-    else if (uart_cfg[uart].rx_port==GPIOD) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    else error_raise(ERROR_UART_INIT);
-
-    if (uart_cfg[uart].tx_port==GPIOA) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    else if (uart_cfg[uart].tx_port==GPIOB) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    else if (uart_cfg[uart].tx_port==GPIOC) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-    else if (uart_cfg[uart].tx_port==GPIOD) 
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    else error_raise(ERROR_UART_INIT);
+    // enable all peripherals
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
 
     // enable uart clocks - also range check UART
     if (uart_cfg[uart].uart==USART1) 
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-    else if (uart_cfg[uart].uart==USART6) 
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE);
     else if (uart_cfg[uart].uart==USART2) 
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
     else if (uart_cfg[uart].uart==USART3) 
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-    else if (uart_cfg[uart].uart==UART4) 
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
-    else if (uart_cfg[uart].uart==UART5)
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, ENABLE);
-    else error_raise(ERROR_UART_INIT);
 
     // configure gpio
     gpio.GPIO_Pin = uart_cfg[uart].rx_pin;
-    gpio.GPIO_Mode = GPIO_Mode_AF;
-    gpio.GPIO_OType = GPIO_OType_PP;
-    gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    gpio.GPIO_Speed = GPIO_Speed_100MHz;
+    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(uart_cfg[uart].rx_port, &gpio);
     gpio.GPIO_Pin = uart_cfg[uart].tx_pin;
+    gpio.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(uart_cfg[uart].tx_port, &gpio);
 
     // configure alternate function
-    if (uart_cfg[uart].uart==USART1) GPIO_AF = GPIO_AF_USART1;
-    if (uart_cfg[uart].uart==USART2) GPIO_AF = GPIO_AF_USART2;
-    if (uart_cfg[uart].uart==USART3) GPIO_AF = GPIO_AF_USART3;
-    if (uart_cfg[uart].uart==USART6) GPIO_AF = GPIO_AF_USART6;
-    if (uart_cfg[uart].uart==UART4) GPIO_AF = GPIO_AF_UART4;
-    if (uart_cfg[uart].uart==UART5) GPIO_AF = GPIO_AF_UART5;
-    for (int i=0; i<16; i++)
-        if (uart_cfg[uart].rx_pin==(uint16_t)1<<i) GPIO_PinSource = (uint8_t)i;
-    GPIO_PinAFConfig(uart_cfg[uart].rx_port, GPIO_PinSource, GPIO_AF);
-    for (int i=0; i<16; i++)
-        if (uart_cfg[uart].tx_pin==(uint16_t)1<<i) GPIO_PinSource = (uint8_t)i;
-    GPIO_PinAFConfig(uart_cfg[uart].tx_port, GPIO_PinSource, GPIO_AF);
+    if (uart_cfg[uart].uart==USART1) 
+        GPIO_PinRemapConfig(GPIO_Remap_USART1, ENABLE);
+    if (uart_cfg[uart].uart==USART2) 
+        GPIO_PinRemapConfig(GPIO_Remap_USART2, ENABLE);
+    if (uart_cfg[uart].uart==USART3) 
+        GPIO_PinRemapConfig(GPIO_FullRemap_USART3, ENABLE);
 
     // configure uart
     if (baud_rate==UART_BAUD_9600) uartdef.USART_BaudRate = 9600;
@@ -106,8 +75,8 @@ void uart_init(uart_t uart, uart_baud_t baud_rate){
     uartdef.USART_WordLength = USART_WordLength_8b;
     uartdef.USART_StopBits = USART_StopBits_1;
     uartdef.USART_Parity = USART_Parity_No;
-    uartdef.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     uartdef.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    uartdef.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_Init(uart_cfg[uart].uart, &uartdef);
 
     // enable uart
