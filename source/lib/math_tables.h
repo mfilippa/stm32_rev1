@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
-// math_tables.h - MPF - 10/2013
+// mathlib_tables.h - MPF - 10/2013
 // -----------------------------------------------------------------------------
 
-#ifndef _MATH_TABLES_H_
-#define _MATH_TABLES_H_
+#ifndef _MATHLIB_TABLES_H_
+#define _MATHLIB_TABLES_H_
 
 // includes
 #include <stdint.h>
@@ -275,4 +275,4 @@ const int32_t atan_table[MATH_ATAN_TABLE_SIZE] = {
         3201,3202,3203,3204,3205,3206,3207,3208,3209,3210,3211,3212,3213,3214,3215,3216,
 };
 
-#endif // _MATH_TABLES_H_
+#endif // _MATHLIB_TABLES_H_

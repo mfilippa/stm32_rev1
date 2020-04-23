@@ -36,7 +36,7 @@ CFLAGS += -I../../source/hil/stm32/driverlib_stm32f4_v1.8.0/inc
 # .. path to libraries (for non standard libraries)
 # LDFLAGS += -L./
 # .. libraries to link: math.h
-LDLIBS += -lm
+# LDLIBS += -lm
 
 # Tools
 OBJCOPY = arm-none-eabi-objcopy

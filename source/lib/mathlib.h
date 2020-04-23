@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
-// math.h - MPF - 01/2017
+// mathlib.h - MPF - 01/2017
 // -----------------------------------------------------------------------------
 
-#ifndef _LIBMATH_H_
-#define _LIBMATH_H_
+#ifndef _MATHLIB_H_
+#define _MATHLIB_H_
 
 // includes
 #include <stdint.h>
@@ -96,4 +96,4 @@ void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q11);
 // qd0_to_abc: qd0 to abc transform, angle in q11
 void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q11);
 
-#endif // _LIBMATH_H_
+#endif // _MATHLIB_H_
