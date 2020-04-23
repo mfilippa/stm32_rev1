@@ -46,7 +46,7 @@ void sch_init(void){
 // tick
 // -----------------------------------------------------------------------------
 void sch_tick(void){
-    int32_t i;
+    uint32_t i;
     // search for non-zero function count and decrement its count
     for (i=0; i<sch.function_count;i++){
         if (sch.function[i].count != 0) {
@@ -63,7 +63,7 @@ void sch_tick(void){
 // step
 // -----------------------------------------------------------------------------
 void sch_step(void){
-    int32_t i;
+    uint32_t i;
     // check each function count, if reached zero, execute task and reload
     for (i=0; i<sch.function_count;i++){
         // execute only if not NULL

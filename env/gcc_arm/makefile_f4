@@ -2,15 +2,24 @@
 # makefile - MPF 04/2020
 # ------------------------------------------------------------------------------
 
-# compiler
-# .. add compiler path to $PATH
-# Linux: export PATH=$PATH:/path_to_compiler/bin/
+# compiler (add compiler to system path)
+# Linux: export PATH=$PATH:/path_to_compiler/
 # Windows: add to path
 CC = arm-none-eabi-gcc
 
-# compiler flags:
+# compiler flags (comment to disable)
+# .. verbose
+# CFLAGS += -v
+# .. C99 standard
+CFLAGS += -std=c99
+# .. optimizations: O, O0, O1, O2, O3, Os
+CFLAGS += -Os
 # .. all warnings
-CFLAGS += -Wall
+CFLAGS += -Wall -Wextra
+# .. warn if floats are == or != compared
+CFLAGS += -Wfloat-equal
+# .. warn if anything depends on size of void
+CFLAGS += -Wpointer-arith
 # .. generate dependency files *.d
 CFLAGS += -MMD -MP
 # .. #define symbols
@@ -22,49 +31,47 @@ CFLAGS += -I../../source/lib
 CFLAGS += -I../../source/hil/stm32/cmsis
 CFLAGS += -I../../source/hil/stm32/stm32f4
 CFLAGS += -I../../source/hil/stm32/driverlib_stm32f4_v1.8.0/inc
-# .. paths to search for source files
-VPATH += ../../source/app
-VPATH += ../../source/lib
-VPATH += ../../source/hil/stm32/stm32f4
-VPATH += ../../source/hil/stm32/gcc_startup
-VPATH += ../../source/hil/stm32/driverlib_stm32f4_v1.8.0/src
+
+# linker flags
+# .. path to libraries (for non standard libraries)
+# LDFLAGS += -L./
+# .. libraries to link: math.h
+LDLIBS += -lm
 
 # Tools
 OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
 
-# Core: 0/3/4/7
+# ARM stuff - extracted from <gcc_arm_compiler>/samples folder
+# .. core: 0/3/4/7
 CORTEX_M=4
-
-# optimizer options
-# 0: none, 1-3: optimize for speed and size, s: optimize for size (default)
-OPTIMIZE = s
-
 # link time optimizer: lto / no-lto
 # VERY AGRESSIVE OPTIMIZATION... use with caution
 # if using LTO, comment weak IRQ handlers in startup! LTO has a bug (?), 
 # will not override weak definitions
 LTO = lto
-
-# .. arm stuff - edit CORTEX_M to target core
-# extracted from <gcc_arm_compiler>/samples folder
+# .. NANO
 # USE_NANO=--specs=nano.specs
-USE_SEMIHOST=--specs=rdimon.specs
-USE_NOHOST=--specs=nosys.specs
-CORE=CM$(CORTEX_M)
-ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
-STARTUP_DEFS=-D__STARTUP_CLEAR_BSS -D__START=main
-CFLAGS +=$(ARCH_FLAGS) $(STARTUP_DEFS) -Os -f$(LTO) -O$(OPTIMIZE) -ffunction-sections -fdata-sections
-GC=-Wl,--gc-sections
-MAP=-Wl,-Map=$(OUTDIR)/$(EXEC).map
-LDSCRIPTS=-L. -L./ldscripts -T stm32f415rg.ld
-LFLAGS=$(USE_NANO) $(USE_NOHOST) $(LDSCRIPTS) $(GC) $(MAP)
+# .. hosting
+# USE_SEMIHOST=--specs=rdimon.specs
+USE_NOHOST = --specs=nosys.specs
+# .. architecture flags
+ARCH_FLAGS = -mthumb -mcpu=cortex-m$(CORTEX_M) -mfloat-abi=hard
+# .. do not change lines below
+CORE = CM$(CORTEX_M)
+STARTUP_DEFS = -D__STARTUP_CLEAR_BSS -D__START=main
+GC = -Wl,--gc-sections
+MAP = -Wl,-Map=$(OUTDIR)/$(EXEC).map
+LDSCRIPTS = -L. -L./ldscripts -T stm32f415rg.ld
+CFLAGS += $(ARCH_FLAGS) $(STARTUP_DEFS) -f$(LTO) -ffunction-sections -fdata-sections
+LDFLAGS += $(USE_NANO) $(USE_NOHOST) $(LDSCRIPTS) $(GC) $(MAP)
 
-# linked libraries:
-# .. path to libraries (for non standard libraries)
-# LDFLAGS += -L./
-# .. libraries to link
-#LIBS += -llib
+# makefile paths to search for source files
+VPATH += ../../source/app
+VPATH += ../../source/lib
+VPATH += ../../source/hil/stm32/stm32f4
+VPATH += ../../source/hil/stm32/gcc_startup
+VPATH += ../../source/hil/stm32/driverlib_stm32f4_v1.8.0/src
 
 # executable name
 EXEC = stm32f415rg
@@ -87,7 +94,7 @@ SRC = app.c \
 	system_stm32f4xx.c \
 	stm32f4xx_gpio.c \
 	stm32f4xx_usart.c \
-	stm32f4xx_rcc.c \
+	stm32f4xx_rcc.c 
 
 # startup
 ASSY = startup_ARM$(CORE).S
@@ -113,8 +120,7 @@ misc : $(OUTDIR)/$(EXEC).axf
 
 # build target - linker command
 $(OUTDIR)/$(EXEC).axf : $(SRC:%.c=$(OBJDIR)/%.o) $(ASSY:%.S=$(OBJDIR)/%.o)
-	$(MKDIR)
-	$(CC) $(CFLAGS) $(LFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 # compile source files
 $(OBJDIR)/%.o : %.c
