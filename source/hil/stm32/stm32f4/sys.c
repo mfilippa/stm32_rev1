@@ -51,6 +51,9 @@ void SysTick_Handler(void){
 // tick get
 // -----------------------------------------------------------------------------
 uint32_t sys_tick_get(void){
+    // F4 micro: clock = 168MHz
+    // 1 tick = 1/168MHz
+    // tick is systick downcounter, it will hit zero at systick event
     return SysTick->VAL;
 }
 

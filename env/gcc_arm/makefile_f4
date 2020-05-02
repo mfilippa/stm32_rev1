@@ -102,12 +102,14 @@ ASSY = startup_ARM$(CORE).S
 # to execute under windows/linux
 ifdef OS
 	FixPath = $(subst /,\,$1)
-	MKDIR = if not exist $(call FixPath,$(OBJDIR)) mkdir $(call FixPath,$(OBJDIR)) 
+	MKDIROBJ = if not exist $(call FixPath,$(OBJDIR)) mkdir $(call FixPath,$(OBJDIR)) 
+	MKDIROUT = if not exist $(call FixPath,$(OUTDIR)) mkdir $(call FixPath,$(OUTDIR)) 
 	RM = del /Q
 	EXT = .exe
 else
 	ifeq ($(shell uname), Linux)
-		MKDIR = mkdir -p $(OBJDIR)
+		MKDIROBJ = mkdir -p $(OBJDIR)
+		MKDIROUT = mkdir -p $(OUTDIR)
 		RM = rm -f
 		FixPath = $1
 	endif
@@ -120,16 +122,17 @@ misc : $(OUTDIR)/$(EXEC).axf
 
 # build target - linker command
 $(OUTDIR)/$(EXEC).axf : $(SRC:%.c=$(OBJDIR)/%.o) $(ASSY:%.S=$(OBJDIR)/%.o)
+	$(MKDIROUT)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 # compile source files
 $(OBJDIR)/%.o : %.c
-	$(MKDIR)
+	$(MKDIROBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # compile assy files
 $(OBJDIR)/%.o : %.S
-	$(MKDIR)
+	$(MKDIROBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # auto dependencies - recompile if a header file changed
