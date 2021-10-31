@@ -1,11 +1,10 @@
 // -----------------------------------------------------------------------------
-// io.c - MPF 11/2019
+// io.c - MPF 10/2021
 // -----------------------------------------------------------------------------
 
 // includes
 #include <stdbool.h>
 #include "stm32f4xx.h"
-#include "error.h"
 #include "io.h"
 
 // io config table
@@ -20,9 +19,10 @@ typedef struct io_config_struct {
 // -----------------------------------------------------------------------------
 // gpio configuration
 io_config_t io_cfg[IO_CH_COUNT] = {
-//  port,  pin ,        mode,          ah,   init_state
+//   port,  pin ,        mode,          ah,   init_state
     {GPIOC, GPIO_Pin_13, GPIO_Mode_OUT, true, IO_STATE_RESET},  // IO_CH_LED
-    {GPIOC, GPIO_Pin_14, GPIO_Mode_OUT, true, IO_STATE_RESET},  // IO_CH_DEBUG
+    {GPIOC, GPIO_Pin_14, GPIO_Mode_OUT, true, IO_STATE_RESET},  // IO_CH_DEBUG1
+    {GPIOC, GPIO_Pin_15, GPIO_Mode_OUT, true, IO_STATE_RESET},  // IO_CH_DEBUG2
 };
 // -----------------------------------------------------------------------------
 
@@ -33,16 +33,6 @@ void io_init(void){
 
     GPIO_InitTypeDef gpio;
     uint32_t i;
-
-    // check ports, pins and mode, the rest are typedef constrained
-    for (i = 0; i < IO_CH_COUNT; ++i) {
-        if ((io_cfg[i].port!=GPIOA)&&(io_cfg[i].port!=GPIOB)&&
-            (io_cfg[i].port!=GPIOC)&&(io_cfg[i].port!=GPIOD)) 
-            error_raise(ERROR_IO_INIT);
-        if (!IS_GPIO_PIN(io_cfg[i].pin)) error_raise(ERROR_IO_INIT);
-        if ((io_cfg[i].mode!=GPIO_Mode_IN)&&(io_cfg[i].mode!=GPIO_Mode_OUT))
-            error_raise(ERROR_IO_INIT);
-    }
 
     // enable all peripherals
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -69,30 +59,26 @@ void io_init(void){
 // set
 // -----------------------------------------------------------------------------
 void io_set(io_ch_t channel){
-    if (channel<IO_CH_COUNT) {
-        if(io_cfg[channel].active_high) {
-            io_cfg[channel].port->BSRRL = io_cfg[channel].pin;
-        }
-        else  {
-            io_cfg[channel].port->BSRRH = io_cfg[channel].pin;
-        }
+    // no error checking for speed
+    if(io_cfg[channel].active_high) {
+        io_cfg[channel].port->BSRRL = io_cfg[channel].pin;
     }
-    else error_raise(ERROR_IO_ARG);
+    else {
+        io_cfg[channel].port->BSRRH = io_cfg[channel].pin;
+    }
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
 void io_reset(io_ch_t channel){
-    if (channel<IO_CH_COUNT) {
-        if(io_cfg[channel].active_high){
-            io_cfg[channel].port->BSRRH = io_cfg[channel].pin;
-        } 
-        else {
-            io_cfg[channel].port->BSRRL = io_cfg[channel].pin;
-        }
+    // no error checking for speed
+    if(io_cfg[channel].active_high){
+        io_cfg[channel].port->BSRRH = io_cfg[channel].pin;
+    } 
+    else {
+        io_cfg[channel].port->BSRRL = io_cfg[channel].pin;
     }
-    else error_raise(ERROR_IO_ARG);
 }
 
 // -----------------------------------------------------------------------------
@@ -100,20 +86,18 @@ void io_reset(io_ch_t channel){
 // -----------------------------------------------------------------------------
 io_state_t io_toggle(io_ch_t channel){
     io_state_t state;
-    if (channel<IO_CH_COUNT) {
-        if (((io_cfg[channel].port->ODR) & 
-                io_cfg[channel].pin) != (uint32_t)Bit_RESET) {
-            io_cfg[channel].port->BSRRH = io_cfg[channel].pin;
-            if(io_cfg[channel].active_high) state = IO_STATE_RESET;
-            else state = IO_STATE_SET;
-        }
-        else {
-            io_cfg[channel].port->BSRRL = io_cfg[channel].pin;
-            if(io_cfg[channel].active_high) state = IO_STATE_SET;
-            else state = IO_STATE_RESET;
-        }
+    // no error checking for speed
+    if (((io_cfg[channel].port->ODR) & 
+            io_cfg[channel].pin) != (uint32_t)Bit_RESET) {
+        io_cfg[channel].port->BSRRH = io_cfg[channel].pin;
+        if(io_cfg[channel].active_high) state = IO_STATE_RESET;
+        else state = IO_STATE_SET;
     }
-    else error_raise(ERROR_IO_ARG);
+    else {
+        io_cfg[channel].port->BSRRL = io_cfg[channel].pin;
+        if(io_cfg[channel].active_high) state = IO_STATE_SET;
+        else state = IO_STATE_RESET;
+    }
     return state;
 }
 
@@ -122,18 +106,16 @@ io_state_t io_toggle(io_ch_t channel){
 // -----------------------------------------------------------------------------
 io_state_t io_read(io_ch_t channel){
     io_state_t state;
-    if (channel<IO_CH_COUNT) {
-        if ((io_cfg[channel].port->IDR & 
-            io_cfg[channel].pin) != (uint32_t)Bit_RESET)  {
-            if(io_cfg[channel].active_high) state = IO_STATE_SET;
-            else state = IO_STATE_RESET;
-        }
-        else {
-            if(io_cfg[channel].active_high) state = IO_STATE_RESET;
-            else state = IO_STATE_SET;
-        }
+    // no error checking for speed
+    if ((io_cfg[channel].port->IDR & 
+        io_cfg[channel].pin) != (uint32_t)Bit_RESET)  {
+        if(io_cfg[channel].active_high) state = IO_STATE_SET;
+        else state = IO_STATE_RESET;
     }
-    else error_raise(ERROR_IO_ARG);
+    else {
+        if(io_cfg[channel].active_high) state = IO_STATE_RESET;
+        else state = IO_STATE_SET;
+    }
     return state;
 }
 

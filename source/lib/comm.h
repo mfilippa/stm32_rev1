@@ -16,15 +16,15 @@
 // packet definitions
 #define COMM_FRAME_START          0x3A      // ':'
 #define COMM_FRAME_END            0x0A      // '\n'
-#define COMM_FRAME_TIMEOUT        20        // ticks, zero to disable
 
 // comm handler typedef
 typedef void (comm_handler_t)(uint32_t rx_size);
 
 // init: initializes module. Buffers are passed to this module by pointers
 // a handler is called after a message is received
-void comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
-        uint8_t * tx_buffer, comm_handler_t * handler);
+void comm_init(uart_t uart, uint32_t buffer_size, 
+	uint8_t * rx_buffer, uint8_t * tx_buffer, 
+	comm_handler_t * handler, uint32_t timeout);
 
 // step: runs communications step, execute in background
 void comm_step(void);

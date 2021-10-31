@@ -9,6 +9,10 @@
 #include "uart.h"
 #include "sch.h"
 #include "comm.h"
+#include "pwm.h"
+#include "adc.h"
+#include "macros.h"
+#include <string.h>
 
 // defines
 #define SYSTICK_FREQ_HZ     (1000)
@@ -26,6 +30,9 @@ void app_led_blink(void);
 void app_comm_handler(uint32_t rx_size);
 void app_systick(void);
 void app_adc_trigger(void);
+void app_dummy(void);
+void app_adc_fast_handler(void);
+void app_adc_slow_handler(void);
 
 // -----------------------------------------------------------------------------
 // init
@@ -47,8 +54,16 @@ void app_init(void) {
     sch_function_register(&app_led_blink,500);
 
     // init comm
-    comm_init(UART_COMM, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer,
-        &app_comm_handler);
+    comm_init(UART_COMM, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer, 
+        &app_comm_handler, 100);
+
+    // init pwm
+    pwm_init(10000,0, 0);  // freq, deadtime, fault handler
+    pwm_enable();
+
+    // init adc
+    adc_init(&app_adc_fast_handler,
+        &app_adc_slow_handler);     // fast handler, slow handler
 
     // enable interrupts
     sys_enable_interrupts();
@@ -78,6 +93,27 @@ void app_systick(void) {
 // -----------------------------------------------------------------------------
 void app_led_blink(void) {
     io_toggle(IO_CH_LED);
+}
+
+// -----------------------------------------------------------------------------
+// fast ADC handler
+// -----------------------------------------------------------------------------
+void app_adc_fast_handler(void){
+    
+}
+
+// -----------------------------------------------------------------------------
+// slow ADC handler
+// -----------------------------------------------------------------------------
+void app_adc_slow_handler(void){
+    
+}
+
+// -----------------------------------------------------------------------------
+// dummy
+// -----------------------------------------------------------------------------
+void app_dummy(void){
+
 }
 
 // -----------------------------------------------------------------------------
@@ -115,6 +151,11 @@ void app_comm_handler(uint32_t rx_size) {
     case 0x07:
         break;
     case 0xD0:
+        for (int32_t i=0;i<ADC_FAST_COUNT;i++) 
+            comm_write16(adc_read_fast((adc_fast_channel_t)i));
+        for (int32_t i=0;i<ADC_SLOW_COUNT;i++) 
+            comm_write16(adc_read_slow((adc_slow_channel_t)i));
+        break;
         break;
     case 0xD1:
         break;

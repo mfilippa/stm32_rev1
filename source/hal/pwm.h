@@ -1,5 +1,7 @@
 // -----------------------------------------------------------------------------
-// pwm.h - MPF 11/2019
+// pwm.h - MPF 10/2021
+// -----------------------------------------------------------------------------
+// 3 phase PWM module with BRK input
 // -----------------------------------------------------------------------------
 
 #ifndef _PWM_H_
@@ -7,36 +9,28 @@
 
 // includes
 #include <stdint.h>
-#include <stdio.h>
-#include <stdbool.h>
 
-// pwm channels 
-// channels can represent one or multiple PWMs
-// implementation is left to hardware layer
-typedef enum pwm_ch_enum{
-    PWM_CH_UVW,
-    PWM_CH_COUNT,
-} pwm_ch_t;
-
-// init: initializes module
+// init module
 // pass a function to PWM hardware fault IRQ, or NULL to disable
-void pwm_init(void (*fault_handler)(void));
+// initializes with 0.5 duty to all channels
+void pwm_init(uint32_t freq, uint32_t deadtime, void (*fault_handler)(void));
 
-// enable: enable channel
-void pwm_enable(pwm_ch_t channel);
+// set deadtime - see implementation layer on details on how this works
+void pwm_set_deadtime(uint32_t deadtime);
 
-// disable: disable channel
-void pwm_disable(pwm_ch_t channel);
+// enable
+void pwm_enable(void);
 
-// set: sets freq in Hz
-void pwm_set_freq(pwm_ch_t channel, uint32_t freq);
+// disable channel
+void pwm_disable(void);
 
-// set: sets duty cycle from 0-1 in q14
-// this function can set multiple duties (left to implementation layer)
-void pwm_set_duty_q(pwm_ch_t channel, uint32_t * duty);
+// set freq in Hz - MUST FOLLOW with set_duty to update periods!
+void pwm_set_freq(uint32_t freq);
 
-// set: sets duty cycle from 0-1 in float
-// this function can set multiple duties (left to implementation layer)
-void pwm_set_duty_f(pwm_ch_t channel, float * duty);
+// set duty cycle from 0-1 in q14
+void pwm_set_duty_q(uint32_t * duty_q14);
+
+// set duty cycle from 0-1 in float
+void pwm_set_duty_f(float * duty);
 
 #endif // _PWM_H_

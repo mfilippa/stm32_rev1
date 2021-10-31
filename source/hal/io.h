@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// io.h - MPF 11/2019
+// io.h - MPF 10/2021
 // -----------------------------------------------------------------------------
 
 #ifndef _IO_H_
@@ -12,7 +12,8 @@
 // io channels - do not use physical ifaces, use hw abstracted names
 typedef enum io_channel_enum {
     IO_CH_LED = 0,           // LED
-    IO_CH_DEBUG,             // DEBUG
+    IO_CH_DEBUG1,            // DEBUG1
+    IO_CH_DEBUG2,            // DEBUG2
     IO_CH_COUNT,
 } io_ch_t;
 

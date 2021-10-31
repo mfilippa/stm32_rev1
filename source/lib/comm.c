@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// SerialComm 3.0 - MPF 11/2019
+// SerialComm 3.0 - MPF 20/2021
 // -----------------------------------------------------------------------------
 
 
@@ -39,9 +39,11 @@ struct comm_struct {
     // handler
     comm_handler_t * handler;
 
+    // timeout
+    uint32_t timeout_reload;
+
     // state machine stuff
     comm_state_t state;
-    uint32_t timeout;
     uint32_t half_byte;
     uint32_t index;
     uint32_t sch_timer_handle;
@@ -62,11 +64,14 @@ uint32_t comm_byte_to_ascii_low(uint32_t value);
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-void comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
-        uint8_t * tx_buffer, comm_handler_t * handler){
+void comm_init(uart_t uart, uint32_t buffer_size, 
+    uint8_t * rx_buffer, uint8_t * tx_buffer, comm_handler_t * handler,
+    uint32_t timeout){
     // save uart
     if (uart>=UART_COUNT) error_raise(ERROR_COMM_INIT);
     else comm.uart = uart;
+    // save timeout
+    comm.timeout_reload = timeout;
     // save buffer data
     comm.buffer_size = buffer_size;
     comm.rx_buffer = rx_buffer;
@@ -84,7 +89,7 @@ void comm_init(uart_t uart, uint32_t buffer_size, uint8_t * rx_buffer,
 // packet state machine
 // -----------------------------------------------------------------------------
 void comm_step(void){
-    // step through state machine
+
     switch(comm.state){
     //-------------------------------------------------------
     case COMM_STATE_IDLE:
@@ -94,7 +99,7 @@ void comm_step(void){
             // SUBEVENT: received start char, start rx
             if (temp == COMM_FRAME_START) {
                 comm.index = 0;
-                sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                 comm.state = COMM_STATE_RX_START;
             }
         }
@@ -105,7 +110,7 @@ void comm_step(void){
                 // send start char
                 comm.index = 0;
                 uart_write(comm.uart,(uint8_t)COMM_FRAME_START);
-                sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                 comm.state = COMM_STATE_TX_HB;
             }
         }
@@ -118,7 +123,7 @@ void comm_step(void){
             // SUBEVENT: it is a HEX, store half byte, wait for other half
             if (IS_HEX(temp)){
                 comm.half_byte = temp;
-                sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                 comm.state = COMM_STATE_RX_HB;
             }
             // else got something else, go to idle
@@ -139,7 +144,7 @@ void comm_step(void){
                 comm.rx_buffer[comm.index] =
                         (uint8_t)(comm_ascii_to_byte(comm.half_byte,temp)&0xFF);
                 comm.index++;
-                sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                 comm.state = COMM_STATE_RX_DATA;
             }
             // else got something else, go to idle
@@ -160,7 +165,7 @@ void comm_step(void){
                 // index is less than buffer size, store and continue
                 if (comm.index<comm.buffer_size){
                     comm.half_byte = temp;
-                    sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                    sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                     comm.state = COMM_STATE_RX_HB;
                 }
                 // else discard
@@ -189,7 +194,7 @@ void comm_step(void){
         if (uart_write_ready(comm.uart)==1){
             // send half byte and wait
             uart_write(comm.uart,(uint8_t)comm_byte_to_ascii_high((uint32_t)comm.tx_buffer[comm.index]));
-            sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+            sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
             comm.state = COMM_STATE_TX_DATA;
         }
         // handle timeout
@@ -208,12 +213,12 @@ void comm_step(void){
             comm.tx_size--;
             // SUBEVENT: more data to send
             if (comm.tx_size!=0){
-                sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                 comm.state = COMM_STATE_TX_HB;
             }
             // else done with data, send end char
             else {
-                sch_timer_set(comm.sch_timer_handle,COMM_FRAME_TIMEOUT);
+                sch_timer_set(comm.sch_timer_handle,comm.timeout_reload);
                 comm.state = COMM_STATE_TX_END;
             }
         }

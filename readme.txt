@@ -61,8 +61,11 @@ How to set up:
 
 How to set up:
 - Get toolchain
-https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm
+https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 - Extract all files, add to path
+  > tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+export PATH=$PATH:/path/to/compiler
+  > export PATH=$PATH:/home/mpf/gcc-arm-none-eabi-10.3-2021.10/bin
 
 Modifications:
 - ldscript:
