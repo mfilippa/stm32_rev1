@@ -1,11 +1,9 @@
 // -----------------------------------------------------------------------------
-// io.c - MPF - 10/2019
+// io.c - MPF - 11/2021
 // -----------------------------------------------------------------------------
 
 // includes
-#include "error.h"
 #include "io.h"
-#include <stdio.h>
 
 // module struct
 struct io_struct {
@@ -23,8 +21,7 @@ void io_init(void){
 // set
 // -----------------------------------------------------------------------------
 void io_set(io_ch_t channel){
-    if (channel<IO_CH_COUNT) io.ch_state[channel] = IO_STATE_SET;
-    else error_raise(ERROR_IO_ARG);
+    io.ch_state[channel]=IO_STATE_SET;
     // output to console
     if(channel==IO_CH_LED) printf("O");
 }
@@ -33,8 +30,7 @@ void io_set(io_ch_t channel){
 // reset
 // -----------------------------------------------------------------------------
 void io_reset(io_ch_t channel){
-    if (channel<IO_CH_COUNT) io.ch_state[channel] = IO_STATE_RESET;
-    else error_raise(ERROR_IO_ARG);
+    io.ch_state[channel]=IO_STATE_RESET;
     // output to console
     if(channel==IO_CH_LED) printf("-");
 }
@@ -44,17 +40,14 @@ void io_reset(io_ch_t channel){
 // -----------------------------------------------------------------------------
 io_state_t io_toggle(io_ch_t channel){
     io_state_t state = IO_STATE_RESET;
-    if (channel<IO_CH_COUNT) {
-        if (io.ch_state[channel]==IO_STATE_RESET) {
-            io_set(channel);
-            state = IO_STATE_SET;
-        } 
-        else {
-            io_reset(channel);
-            state = IO_STATE_RESET;
-        }
+    if (io.ch_state[channel]==IO_STATE_RESET) {
+        io_set(channel);
+        state = IO_STATE_SET;
+    } 
+    else {
+        io_reset(channel);
+        state = IO_STATE_RESET;
     }
-    else error_raise(ERROR_IO_ARG);
     return state;
 }
 
@@ -62,8 +55,5 @@ io_state_t io_toggle(io_ch_t channel){
 // read
 // -----------------------------------------------------------------------------
 io_state_t io_read(io_ch_t channel){
-    io_state_t state = IO_STATE_RESET;
-    if (channel<IO_CH_COUNT) state = io.ch_state[channel];
-    else error_raise(ERROR_IO_ARG);
-    return state;
+    return io.ch_state[channel];
 }

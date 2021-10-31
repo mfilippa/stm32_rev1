@@ -42,6 +42,8 @@ SRC = app.c \
 	io.c \
 	sys.c \
 	uart.c \
+	pwm.c \
+	adc.c \
 	error.c
 
 # to execute under windows/linux
