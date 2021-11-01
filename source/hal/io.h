@@ -23,6 +23,14 @@ typedef enum io_states_enum {
     IO_STATE_SET,
 } io_state_t;
 
+// *** for simulation environment only ***
+// io data
+typedef struct io_data_struct {
+    io_state_t state[IO_CH_COUNT];
+} io_data_t;
+extern io_data_t io_data;
+// *** end simulation environment data ***
+
 // init: initializes module
 void io_init(void);
 

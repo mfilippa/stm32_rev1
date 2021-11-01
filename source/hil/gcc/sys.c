@@ -1,22 +1,18 @@
 // -----------------------------------------------------------------------------
-// sys.c - MPF 11/2019
+// sys.c - MPF 11/2021
 // -----------------------------------------------------------------------------
 
 // includes
 #include "sys.h"
 
-// module struct
-struct sys_struct {
-    uint32_t frequency;
-    void (*handler)(void);
-} sys;
+// sys data
+sys_data_t sys_data;
 
 // -----------------------------------------------------------------------------
 // systick init
 // -----------------------------------------------------------------------------
 void sys_tick_init(uint32_t frequency, void (*handler)(void)){
-    sys.frequency = frequency;
-    sys.handler = handler;
+    sys_data.systick_handler = handler;
 }
 
 // -----------------------------------------------------------------------------

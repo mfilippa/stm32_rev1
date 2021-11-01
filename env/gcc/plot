@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# make and plot
+make
+if [ $? -eq 0 ]; then
+	./debug
+	gnuplot plotcmd.txt
+else
+	echo "Make failed..."
+fi

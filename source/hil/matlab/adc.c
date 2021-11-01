@@ -1,73 +1,39 @@
 // -----------------------------------------------------------------------------
-// adc.c - MPF - 10/2013
+// adc.c - MPF 11/2021
 // -----------------------------------------------------------------------------
 
 // includes
-#include "wrapper.h"
-#include "hal/halinc.h"
+#include "adc.h"
 
-
-// module structure
-struct adc_struct {
-    // adc configuration
-    adc_config_t * config;
-    // handlers
-    void (*slow_handler)(void);
-    void (*fast_handler)(void);
-} adc;
+// adc data
+adc_data_t adc_data;
 
 // -----------------------------------------------------------------------------
-// initialize
+// init
 // -----------------------------------------------------------------------------
-uint32_t adc_init(adc_config_t * config, void (*slow_handler)(void), void (*fast_handler)(void)){
-
-    // store data
-    adc.slow_handler = slow_handler;
-    adc.fast_handler = fast_handler;
-    adc.config = config;
-
-    return 0;
+void adc_init(void (*slow_handler)(void), void (*fast_handler)(void)){ 
+    adc_data.fast_handler = fast_handler;
+    adc_data.slow_handler = slow_handler;
+    for (int i=0; i<ADC_FAST_COUNT; i++) adc_data.fast_raw[i] = 0;
+    for (int i=0; i<ADC_SLOW_COUNT; i++) adc_data.slow_raw[i] = 0;
 }
 
 // -----------------------------------------------------------------------------
-// read
+// sw trigger
 // -----------------------------------------------------------------------------
-uint32_t adc_read(uint32_t channel){
-    if (channel>=adc.config->nr_channels) return 0;
-    else return pin[adc.config->pin_start+channel];
+void adc_sw_trigger_fast(void) {
+    // nothing to do
+}
+void adc_sw_trigger_slow(void) {
+    // nothing to do
 }
 
 // -----------------------------------------------------------------------------
-// trigger_slow
+// ADC read
 // -----------------------------------------------------------------------------
-void adc_sw_trigger_slow(void){
-    adc.slow_handler();
+uint32_t adc_read_fast(uint32_t channel) {
+    return adc_data.fast_raw[channel];
 }
-
-// -----------------------------------------------------------------------------
-// trigger_fast
-// -----------------------------------------------------------------------------
-void adc_sw_trigger_fast(void){
-    adc.fast_handler();
+uint32_t adc_read_slow(uint32_t channel) {
+    return adc_data.slow_raw[channel];
 }
-
-// -----------------------------------------------------------------------------
-// ADC fast handler
-// -----------------------------------------------------------------------------
-void adc_fast_handler(void){
-    // call handler
-    if (adc.fast_handler != 0) {
-        adc.fast_handler();
-    }
-}
-
-// -----------------------------------------------------------------------------
-// ADC slow handler
-// -----------------------------------------------------------------------------
-void adc_slow_handler(void){
-    // call handler
-    if (adc.slow_handler != 0) {
-        adc.slow_handler();
-    }
-}
-

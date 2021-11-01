@@ -1,78 +1,64 @@
 // -----------------------------------------------------------------------------
-// pwm.h - MPF - 2/2014
+// pwm.h - MPF 10/2021
 // -----------------------------------------------------------------------------
 
 // includes
-#include "hal/halinc.h"
-#include "wrapper.h"
+#include <stdbool.h>
+#include "pwm.h"
+#include "macros.h"
 
-// definitions
-#define PWM_FREQUENCY (10000)
-
-// module structure
-struct pwm_struct {
-    void (*fault_handler)(void);
-    uint32_t enabled;
-    double value1;
-    double value2;
-    double value3;
-} pwm;
+// pwm data
+pwm_data_t pwm_data;
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-uint32_t pwm_init(void (*fault_handler)(void)){
-    // init
-    pwm.enabled = 0;
-    pout[0] = pout[1] = pout[2] = 0;
-    pwm.value1 = pwm.value2 = pwm.value3 = 0.5;
-    // store handler
-    pwm.fault_handler = fault_handler;
-    return 0;
-
+void pwm_init(uint32_t freq, uint32_t deadtime, void (*fault_handler)(void)){
+    // store params
+    pwm_data.freq = (double)freq;
+    // initial values
+    for (int i=0; i<3; i++) pwm_data.duty[i] = 0.5;
+    pwm_data.enable = false;
 }
 
 // -----------------------------------------------------------------------------
-// enable
+// set deadtime
+// -----------------------------------------------------------------------------
+void pwm_set_deadtime(uint32_t deadtime){
+    // do nothing
+}
+
+// -----------------------------------------------------------------------------
+// enable channel
 // -----------------------------------------------------------------------------
 void pwm_enable(void){
-    pwm.enabled = 1;
-    pout[0] = pwm.value1;
-    pout[1] = pwm.value2;
-    pout[2] = pwm.value3;
+    pwm_data.enable = true;
 }
 
 // -----------------------------------------------------------------------------
 // disable
 // -----------------------------------------------------------------------------
 void pwm_disable(void){
-    pwm.enabled = 0;
-    pout[0] = pout[1] = pout[2] = 0;
+    pwm_data.enable = false;
 }
 
 // -----------------------------------------------------------------------------
-// set
+// set freq
 // -----------------------------------------------------------------------------
-void pwm_setq(uint32_t * amp){
-    if(amp[1]>(1.0*(1<<14))) return;
-    if(amp[2]>(1.0*(1<<14))) return;
-    if(amp[3]>(1.0*(1<<14))) return;
-    pwm.value1 = ((double)amp[1])/((double)(1<<14));
-    pwm.value2 = ((double)amp[2])/((double)(1<<14));
-    pwm.value3 = ((double)amp[3])/((double)(1<<14));
-    if (pwm.enabled==1){
-        pout[0] = pwm.value1;
-        pout[1] = pwm.value2;
-        pout[2] = pwm.value3;
-    }
+void pwm_set_freq_q(uint32_t freq){
+    pwm_data.freq = (double) freq;
 }
 
 // -----------------------------------------------------------------------------
-// simulated pwm fault
+// set duty in fixed point q14 [0-1]
 // -----------------------------------------------------------------------------
-void pwm_matlab_fault(void){
-
-    // call handler
-    if(pwm.fault_handler!= 0) pwm.fault_handler();
+void pwm_set_duty_q(uint32_t * duty_q14){
+    for (int i=0; i<3; i++) pwm_data.duty[i] = Q2F(duty_q14[i],14);
 }
 
+// -----------------------------------------------------------------------------
+// set duty in float [0-1]
+// -----------------------------------------------------------------------------
+void pwm_set_duty_f(float * duty){
+    for (int i=0; i<3; i++) pwm_data.duty[i] = duty[i];
+}

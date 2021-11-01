@@ -1,24 +1,15 @@
 // -----------------------------------------------------------------------------
-// uart.c - MPF - 11/2019
+// uart.c - MPF - 11/2021
 // -----------------------------------------------------------------------------
 
 // includes
 #include "uart.h"
-#include "error.h"
-
-// module struct
-struct uart_struct {
-    uart_baud_t baud[UART_COUNT];
-} uart;
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
 void uart_init(uart_t uart_iface, uart_baud_t baud_rate){
-    if((uart_iface<UART_COUNT)&&(baud_rate<UART_BAUD_COUNT)){
-        uart.baud[uart_iface] = baud_rate;
-    }
-    else error_raise(ERROR_UART_INIT);
+    // nothing to do
 }
 
 // -----------------------------------------------------------------------------

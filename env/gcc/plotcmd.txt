@@ -1,0 +1,58 @@
+# gnuplot file - MPF 11/2019
+
+# common settings
+set terminal jpeg size 1700,900
+set output "output.jpg"
+set datafile separator ','
+set grid
+
+# multiplot settings
+set multiplot layout 3,3
+
+# Led
+set title "LED"
+set autoscale
+plot [] [-0.5:1.5] "output.csv" using 1:2 with lines notitle lw 2
+
+# Debug1
+set title "DEBUG1"
+set autoscale
+plot [] [] "output.csv" using 1:3 with lines notitle lw 2
+
+# Debug2
+set title "DEBUG2"
+set autoscale
+plot [] [] "output.csv" using 1:4 with lines notitle lw 2
+
+# --
+set title "--"
+set autoscale
+plot [] [] "output.csv" using 1:5 with lines notitle lw 2
+
+# --
+set title "--"
+set autoscale
+plot [] [] "output.csv" using 1:6 with lines notitle lw 2
+
+# --
+set title "--"
+set autoscale
+plot [] [] "output.csv" using 1:7 with lines notitle lw 2
+
+# --
+set title "--"
+set autoscale
+plot [] [] "output.csv" using 1:8 with lines notitle lw 2
+
+# --
+set title "--"
+set autoscale
+plot [] [] "output.csv" using 1:9 with lines notitle lw 2
+
+# --
+set title "--"
+set autoscale
+plot [] [] "output.csv" using 1:10 with lines notitle lw 2
+
+# close multiplot
+unset multiplot

@@ -1,63 +1,57 @@
 // -----------------------------------------------------------------------------
-// io.c - MPF - 10/2019
+// io.c - MPF - 11/2021
 // -----------------------------------------------------------------------------
 
 // includes
-#include "hal/io.h"
-#include "wrapper.h"
+#include "io.h"
 
-// matlab port map
-uint32_t io_port_map[IO_CH_COUNT] = {
-    0,      // IO_CH_LED
-    1,      // IO_CH
-};
-
-// channel state
-uint32_t io_channel_state[IO_CH_COUNT] = {0, 0};
+// io data
+io_data_t io_data;
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-uint32_t io_init(void){
-    // nothing to do
-    return 0;
+void io_init(void){
+
 }
 
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
 void io_set(io_ch_t channel){
-    io_channel_state[channel] = pout[io_port_map[channel]] = 1;
+    io_data.state[channel]=IO_STATE_SET;
+    // output to console
+    if(channel==IO_CH_LED) printf("O");
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
 void io_reset(io_ch_t channel){
-    io_channel_state[channel] = pout[io_port_map[channel]] = 0;
+    io_data.state[channel]=IO_STATE_RESET;
+    // output to console
+    if(channel==IO_CH_LED) printf("-");
 }
 
 // -----------------------------------------------------------------------------
 // toggle
 // -----------------------------------------------------------------------------
 io_state_t io_toggle(io_ch_t channel){
-    if (io_channel_state[channel]) {
+    io_state_t state = IO_STATE_RESET;
+    if (io_data.state[channel]==IO_STATE_RESET) {
         io_set(channel);
-        return IO_STATE_SET;
-    } else {
+        state = IO_STATE_SET;
+    } 
+    else {
         io_reset(channel);
-        return IO_STATE_RESET;
+        state = IO_STATE_RESET;
     }
+    return state;
 }
 
 // -----------------------------------------------------------------------------
 // read
 // -----------------------------------------------------------------------------
 io_state_t io_read(io_ch_t channel){
-    if (pin[io_port_map[channel]] == 0) {
-        return IO_STATE_RESET;
-    } else {
-        return IO_STATE_SET;
-    }
+    return io_data.state[channel];
 }
-

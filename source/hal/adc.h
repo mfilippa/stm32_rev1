@@ -37,6 +37,17 @@ typedef enum adc_slow_channels_enum {
     ADC_SLOW_COUNT,
 } adc_slow_channel_t;
 
+// *** for simulation environment only ***
+// adc data
+typedef struct adc_data_struct {
+    uint32_t fast_raw[ADC_FAST_COUNT];
+    uint32_t slow_raw[ADC_SLOW_COUNT];
+    void (*slow_handler)(void);
+    void (*fast_handler)(void);
+} adc_data_t;
+extern adc_data_t adc_data;
+// *** end simulation environment data ***
+
 // init: intializes the module
 // Two groups expected: fast conversion and slow conversion
 // Pass function pointers if interrupts are to be generated after

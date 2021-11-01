@@ -9,6 +9,18 @@
 
 // includes
 #include <stdint.h>
+#include <stdbool.h>
+
+// *** for simulation environment only ***
+// pwm data
+#define PWM_NR_CHANNELS 3
+typedef struct pwm_data_struct {
+    double freq;
+    double duty[PWM_NR_CHANNELS];
+    bool enable;
+} pwm_data_t;
+extern pwm_data_t pwm_data;
+// *** end simulation environment data ***
 
 // init module
 // pass a function to PWM hardware fault IRQ, or NULL to disable

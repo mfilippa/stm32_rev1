@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// sys.h - MPF 11/2019
+// sys.h - MPF 11/2021
 // -----------------------------------------------------------------------------
 
 #ifndef _SYS_H_
@@ -8,6 +8,14 @@
 // includes
 #include <stdint.h>
 #include <stdio.h>
+
+// *** for simulation environment only ***
+// sys data
+typedef struct sys_data_struct {
+    void (*systick_handler)(void);
+} sys_data_t;
+extern sys_data_t sys_data;
+// *** end simulation environment data ***
 
 // tick_init: initializes a system timer
 // pass a handler to call when timer expires, pass NULL to disable

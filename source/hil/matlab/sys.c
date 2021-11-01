@@ -1,60 +1,47 @@
 // -----------------------------------------------------------------------------
-// sys.c - MPF - 10/2013
+// sys.c - MPF 11/2021
 // -----------------------------------------------------------------------------
 
 // includes
-#include "hal/halinc.h"
-#include "wrapper.h"
+#include "sys.h"
 
-// module structure
-struct sys_struct {
-    void (*handler)(void);
-} sys;
+// sys data
+sys_data_t sys_data;
 
 // -----------------------------------------------------------------------------
 // systick init
 // -----------------------------------------------------------------------------
-int32_t sys_tick_init(uint32_t frequency, void (*handler)(void)){
-    // register handler
-    sys.handler = handler;
-    // return with no error
-    return 0;
+void sys_tick_init(uint32_t frequency, void (*handler)(void)){
+    sys_data.systick_handler = handler;
 }
 
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
 void sys_reset(void){
-
-}
-
-// -----------------------------------------------------------------------------
-// systick handler
-// -----------------------------------------------------------------------------
-void sys_tick_handler(void){
-    // call handler
-    if (sys.handler!=0) sys.handler();
+    // nothing to do
 }
 
 // -----------------------------------------------------------------------------
 // tick get
 // -----------------------------------------------------------------------------
 uint32_t sys_tick_get(void){
+    // not implemented
     return 0;
 }
 
+
 // -----------------------------------------------------------------------------
-// global interrupt enable
+// enable interrupts
 // -----------------------------------------------------------------------------
 void sys_enable_interrupts(void){
-
+    // nothing to do
 }
 
 // -----------------------------------------------------------------------------
-// global interrupt disable
+// disable interrupts
 // -----------------------------------------------------------------------------
 void sys_disable_interrupts(void){
-
+    // nothing to do
 }
-
 

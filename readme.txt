@@ -7,24 +7,19 @@ Cross platform project that supports:
 - Windows/Linux simulation
 - Matlab simulation
 
-Toolchains for STM32:
-- Keil: demo version, 32K limit
-  > /env/keil
-- arm gcc: free, no limits
-  > /env/gcc_arm
+Toolchains:
+- /env/gcc_arm  - free, no limits
+- /env/gcc      - for linux/windows simulation, using gcc/mingw64
+- /env/matlab   - to simulate in matlab/simulink, using mingw64
 
-Toolchains for other platforms:
-- gcc: for linux/windows simulation, using gcc/mingw
-  > /env/gcc
-- matlab: to simulate in matlab/simulink, using mingw
-  > /env/matlab
+## Known issues
+- stm32f1 not done yet. Rest of platforms are working.
 
 # Architecture
 
 /env        : contains all build files for all platforms: gcc, arm, matlab, etc
   /gcc      : build files for windows/linux
   /gcc_arm  : build files for arm
-  /keil     : keil IDE
   /matlab   : build files and model to run in matlab
 / source    : source code
   /app      : application (cross platform code)
@@ -42,17 +37,6 @@ How to set up:
 - update makefile
 - make and run
 
-## Keil compiler 
-
-How to set up:
-- open project in env/keil
-- options for target > select target device
-- project > manage > project items > add all files to compile
-- options for target > debug > set target debugger
-- ... verify that connects (sw device should populate)
-- ... flash download > check program / verify / run
-- compile, flash and run
-
 ## Arm gcc compiler
 
 *** Current issues ***
@@ -65,7 +49,7 @@ https://developer.arm.com/tools-and-software/open-source-software/developer-tool
 - Extract all files, add to path
   > tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
 export PATH=$PATH:/path/to/compiler
-  > export PATH=$PATH:/home/mpf/gcc-arm-none-eabi-10.3-2021.10/bin
+  > export PATH=$PATH:/home/user/gcc-arm-none-eabi-10.3-2021.10/bin
 
 Modifications:
 - ldscript:
@@ -90,5 +74,11 @@ Where files come from:
   > startup/*
   > makefile
 
-## Setting up the micro
+Setting up the micro:
 - Adjust HSE_VALUE definition in stm32f4xx.h and stm32f10x.h
+
+# Plotting results in C simulation
+
+- Install gnuplot (sudo apt install gnuplot)
+- run command '/env/gcc/gnuplot plotcmd.txt'
+- or run '/env/gcc/plot' script which will run make and gnuplot

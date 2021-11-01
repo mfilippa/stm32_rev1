@@ -28,9 +28,9 @@ CFLAGS += -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER
 CFLAGS += -I../../source/app
 CFLAGS += -I../../source/hal
 CFLAGS += -I../../source/lib
-CFLAGS += -I../../source/hil/stm32/cmsis
-CFLAGS += -I../../source/hil/stm32/stm32f4
-CFLAGS += -I../../source/hil/stm32/driverlib_stm32f4_v1.8.0/inc
+CFLAGS += -I../../source/hil/stm32f4
+CFLAGS += -I../../source/hil/stm32f4/cmsis
+CFLAGS += -I../../source/hil/stm32f4/driverlib_stm32f4_v1.8.0/inc
 
 # linker flags
 # .. path to libraries (for non standard libraries)
@@ -69,9 +69,9 @@ LDFLAGS += $(USE_NANO) $(USE_NOHOST) $(LDSCRIPTS) $(GC) $(MAP)
 # makefile paths to search for source files
 VPATH += ../../source/app
 VPATH += ../../source/lib
-VPATH += ../../source/hil/stm32/stm32f4
-VPATH += ../../source/hil/stm32/gcc_startup
-VPATH += ../../source/hil/stm32/driverlib_stm32f4_v1.8.0/src
+VPATH += ../../source/hil/stm32f4
+VPATH += ../../source/hil/stm32f4/gcc_startup
+VPATH += ../../source/hil/stm32f4/driverlib_stm32f4_v1.8.0/src
 
 # executable name
 EXEC = stm32f415rg

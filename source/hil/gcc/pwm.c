@@ -7,25 +7,18 @@
 #include "pwm.h"
 #include "macros.h"
 
-// definitions
-
-
-// module struct
-struct pwm_struct {
-    double freq;
-    double duty[3];
-    bool enable;
-} pwm;
+// pwm data
+pwm_data_t pwm_data;
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
 void pwm_init(uint32_t freq, uint32_t deadtime, void (*fault_handler)(void)){
     // store params
-    pwm.freq = (double)freq;
+    pwm_data.freq = (double)freq;
     // initial values
-    for (int i=0; i<3; i++) pwm.duty[i] = 0.5;
-    pwm.enable = false;
+    for (int i=0; i<3; i++) pwm_data.duty[i] = 0.5;
+    pwm_data.enable = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -39,33 +32,33 @@ void pwm_set_deadtime(uint32_t deadtime){
 // enable channel
 // -----------------------------------------------------------------------------
 void pwm_enable(void){
-    pwm.enable = true;
+    pwm_data.enable = true;
 }
 
 // -----------------------------------------------------------------------------
-// disable channel
+// disable
 // -----------------------------------------------------------------------------
-void pwm_disable_ch(void){
-    pwm.enable = false;
+void pwm_disable(void){
+    pwm_data.enable = false;
 }
 
 // -----------------------------------------------------------------------------
 // set freq
 // -----------------------------------------------------------------------------
 void pwm_set_freq_q(uint32_t freq){
-    pwm.freq = (double) freq;
+    pwm_data.freq = (double) freq;
 }
 
 // -----------------------------------------------------------------------------
 // set duty in fixed point q14 [0-1]
 // -----------------------------------------------------------------------------
 void pwm_set_duty_q(uint32_t * duty_q14){
-    for (int i=0; i<3; i++) pwm.duty[i] = Q2F(duty_q14[i],14);
+    for (int i=0; i<3; i++) pwm_data.duty[i] = Q2F(duty_q14[i],14);
 }
 
 // -----------------------------------------------------------------------------
 // set duty in float [0-1]
 // -----------------------------------------------------------------------------
 void pwm_set_duty_f(float * duty){
-    for (int i=0; i<3; i++) pwm.duty[i] = duty[i];
+    for (int i=0; i<3; i++) pwm_data.duty[i] = duty[i];
 }
