@@ -11,6 +11,7 @@
 #include "comm.h"
 #include "pwm.h"
 #include "adc.h"
+#include "dac.h"
 #include "macros.h"
 #include <string.h>
 
@@ -64,6 +65,9 @@ void app_init(void) {
     // init adc
     adc_init(&app_adc_fast_handler,
         &app_adc_slow_handler);     // fast handler, slow handler
+
+    // init dac
+    dac_init(DAC_TRIGGER_SW);
 
     // enable interrupts
     sys_enable_interrupts();

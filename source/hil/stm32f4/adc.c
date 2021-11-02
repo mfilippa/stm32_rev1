@@ -30,7 +30,7 @@
 // ADC1 count must be always greater than ADC2 and ADC3 count, add dummy 
 // conversions if needed (see FAST SEQUENCE CONFIGURATION below for explanation)
 // Set ADC2/3 count to zero to disable conversion
-#define ADC1_FAST_COUNT     4      // range: 1..4
+#define ADC1_FAST_COUNT     4       // range: 1..4 - ONE MORE THAN ADC2/3
 #define ADC2_FAST_COUNT     3       // range: 0..3
 #define ADC3_FAST_COUNT     3       // range: 0..3
 #define ADC_FAST_CH_COUNT (ADC1_FAST_COUNT+ADC2_FAST_COUNT+ADC3_FAST_COUNT)
@@ -39,18 +39,19 @@
 // ADC1 available channels: ADC_Channel_0..15
 // ADC2 available channels: ADC_Channel_0..15
 // ADC3 available channels: ADC_Channel_0..3, 10..13
+// ADC CH4 and CH5 are shared with DAC1 and DAC2
 // comment unused channels
 uint32_t adc_fast_ch_seq[ADC_FAST_CH_COUNT] = {
-    // ADC1
+    // ADC1:
     ADC_Channel_0,
     ADC_Channel_1,
     ADC_Channel_2,
     ADC_Channel_3,
-    // ADC2
-    ADC_Channel_4,
-    ADC_Channel_5,
+    // ADC2:
     ADC_Channel_6,
-    // ADC3
+    ADC_Channel_7,
+    ADC_Channel_8,
+    // ADC3:
     ADC_Channel_10,
     ADC_Channel_11,
     ADC_Channel_12,
@@ -65,15 +66,16 @@ uint32_t adc_fast_ch_seq[ADC_FAST_CH_COUNT] = {
 
 // ADC channel sequence
 // ADC1 available channels: ADC_Channel_0..15
+// ADC CH4 and CH5 are shared with DAC1 and DAC2
 // comment unused channels
 uint32_t adc_slow_ch_seq[ADC_SLOW_CH_COUNT] = {
     ADC_Channel_0,
     ADC_Channel_1,
     ADC_Channel_2,
     ADC_Channel_3,
-    ADC_Channel_4,
-    ADC_Channel_5,
     ADC_Channel_6,
+    ADC_Channel_7,
+    ADC_Channel_8,
     ADC_Channel_16,
 };
 

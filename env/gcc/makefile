@@ -44,6 +44,7 @@ SRC = app.c \
 	uart.c \
 	pwm.c \
 	adc.c \
+	dac.c \
 	error.c
 
 # to execute under windows/linux
