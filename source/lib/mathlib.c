@@ -1,43 +1,42 @@
 // -----------------------------------------------------------------------------
-// mathlib.c - MPF - 10/2013
+// mathlib.c - MPF - 11/2020
 // -----------------------------------------------------------------------------
 
 // includes
 #include "math_tables.h"
 #include "mathlib.h"
 
-// math tables
-
-// atan2 ratio in Q14 to table offset of size 2047
-// = 2048 / 2^14
-#define MATH_ATAN2_RATIO2OFFSET           16383    // minus 1, simulate in matlab
-#define MATH_ATAN2_RATIO2OFFSET_Q           17
-
-// sin table angle (rad) to table offset
-// = 2048 / (2*pi*2^11)
-#define MATH_SIN_RAD2OFFSET           20860
-#define MATH_SIN_RAD2OFFSET_Q           17
-
-
-// angle defines in q11
-#define ANGLE_30DEG        MATH_DEG_TO_RAD(30,11)
-#define ANGLE_60DEG        MATH_DEG_TO_RAD(60,11)
-#define ANGLE_90DEG        MATH_DEG_TO_RAD(90,11)
+// MANY OF THESE FUNCTIONS DO NOT PERFORM RANGE CHECK, TRADE OFF FOR SPEED
+// RANGE CHECK BEFORE PASSING ARGUMENTS TO FUNCTION
 
 // -----------------------------------------------------------------------------
-// sin - angle in rads q11, returns amplitude in Q14 - NO RANGE CHECK (use macro)
+// sin - angle mapped to q16, returns amplitude in Q14
 // -----------------------------------------------------------------------------
-int32_t math_sin(int32_t angle_q11){
-    return sine_table[(angle_q11*MATH_SIN_RAD2OFFSET)>>MATH_SIN_RAD2OFFSET_Q];
+int32_t math_sin(int32_t angle_q16){
+#ifdef MATH_SIN_COS_INTERPOLATION
+    // with interpolation
+    int32_t index, fract_q14, s1, s2;
+    angle_q16 = MATH_ANGLE_RANGE_CHECK(angle_q16);
+    index = angle_q16>>(16-MATH_SINE_TABLE_SIZE_Q);
+    fract_q14 = (angle_q16 - (index<<(16-MATH_SINE_TABLE_SIZE_Q)))<<
+        (14-(16-MATH_SINE_TABLE_SIZE_Q));
+    s1 = sine_table[index];
+    s2 = sine_table[index+1];
+    return ((((1<<14)-fract_q14)*s1)>>14)+((fract_q14*s2)>>14);
+#else
+    // without interpolation
+    return sine_table[MATH_ANGLE_RANGE_CHECK(angle_q16)>>
+        (16-MATH_SINE_TABLE_SIZE_Q)];
+#endif
 }
 
 // -----------------------------------------------------------------------------
-// cos - angle in rads q11, returns amplitude in Q14 - NO RANGE CHECK (use macro)
+// cos - angle mapped to q16, returns amplitude in Q14 
 // -----------------------------------------------------------------------------
-int32_t math_cos(int32_t angle_q11){
-    angle_q11 = angle_q11+MATH_DEG_TO_RAD(90,11);
-    if (angle_q11>=MATH_DEG_TO_RAD(360, 11)) angle_q11 -= MATH_DEG_TO_RAD(360, 11);
-    return math_sin(angle_q11);
+int32_t math_cos(int32_t angle_q16){
+    angle_q16 += MATH_DEG_TO_Q16(90);
+    return sine_table[MATH_ANGLE_RANGE_CHECK(angle_q16)
+        >>(16-MATH_SINE_TABLE_SIZE_Q)];
 }
 
 // -----------------------------------------------------------------------------
@@ -69,16 +68,6 @@ int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, uint32_t 
     return result;
 }
 
-// -----------------------------------------------------------------------------
-// fast table look up
-// -----------------------------------------------------------------------------
-int32_t math_fast_table_lookup(int32_t value, const math_tlookup_t * table,
-        uint32_t tsize){
-uint32_t index = (tsize * value)>>14;
-if (index>=tsize) return 0;
-return table[index].y + ((table[index].slope*(value-table[index].x))>>
-                table[index].slope_q);
-}
 // -----------------------------------------------------------------------------
 // biquad filter init
 // -----------------------------------------------------------------------------
@@ -143,61 +132,60 @@ int32_t math_sqrt(int32_t n) {
 // atan2 - based on Jim Shima self normalizing atan, angle in Q11
 //------------------------------------------------------------------------------
 int32_t math_atan2(int32_t y, int32_t x){
-    int32_t ratio, angle_q11;
-    if ((x==0)&&(y==0)) return 0; // undefined, return 0 degrees
-    if (y>=0){
-        if (x>=0){    // I quadrant
-            // compute ratio = (y-x)/(x+y)
-            ratio = (((y-x))<<14)/((x+y));
-            ratio = ((1<<14)/2) + (ratio/2);
-            ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
-            // return angle
-            angle_q11 = atan_table[ratio];
-        } else {    // II quadrant
-            // compute ratio = (y+x)/(-x+y)
-            ratio = (((y+x))<<14)/((-x+y));
-            ratio = ((1<<14)/2) + (ratio/2);
-            ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
-            // return angle
-            angle_q11 = MATH_DEG_TO_RAD(180,11) - atan_table[ratio];
-        }
-    } else {    // y < 0
-        if (x>=0) {    // IV quadrant
-            // compute ratio = (-y-x)/(x-y)
-            ratio = (((-y-x))<<14)/((x-y));
-            ratio = ((1<<14)/2) + (ratio/2);
-            ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
-            // return angle
-            angle_q11 = - atan_table[ratio];
-        } else {    // III quadrant
-            // compute ratio = (-y+x)/(-x-y)
-            ratio = (((-y+x))<<14)/((-x-y));
-            ratio = ((1<<14)/2) + (ratio/2);
-            ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
-            // return angle
-            angle_q11 = - MATH_DEG_TO_RAD(180,11) + atan_table[ratio];
-        }
-    }
-    return angle_q11;
+    // int32_t ratio, angle_q11;
+    // if ((x==0)&&(y==0)) return 0; // undefined, return 0 degrees
+    // if (y>=0){
+    //     if (x>=0){    // I quadrant
+    //         // compute ratio = (y-x)/(x+y)
+    //         ratio = (((y-x))<<14)/((x+y));
+    //         ratio = ((1<<14)/2) + (ratio/2);
+    //         ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
+    //         // return angle
+    //         angle_q11 = atan_table[ratio];
+    //     } else {    // II quadrant
+    //         // compute ratio = (y+x)/(-x+y)
+    //         ratio = (((y+x))<<14)/((-x+y));
+    //         ratio = ((1<<14)/2) + (ratio/2);
+    //         ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
+    //         // return angle
+    //         angle_q11 = MATH_DEG_TO_Q16(180,11) - atan_table[ratio];
+    //     }
+    // } else {    // y < 0
+    //     if (x>=0) {    // IV quadrant
+    //         // compute ratio = (-y-x)/(x-y)
+    //         ratio = (((-y-x))<<14)/((x-y));
+    //         ratio = ((1<<14)/2) + (ratio/2);
+    //         ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
+    //         // return angle
+    //         angle_q11 = - atan_table[ratio];
+    //     } else {    // III quadrant
+    //         // compute ratio = (-y+x)/(-x-y)
+    //         ratio = (((-y+x))<<14)/((-x-y));
+    //         ratio = ((1<<14)/2) + (ratio/2);
+    //         ratio = (ratio * MATH_ATAN2_RATIO2OFFSET)>>MATH_ATAN2_RATIO2OFFSET_Q;
+    //         // return angle
+    //         angle_q11 = - MATH_DEG_TO_Q16(180,11) + atan_table[ratio];
+    //     }
+    // }
+    // return angle_q11;
+    return 0;
 }
 
 //------------------------------------------------------------------------------
-// abc to qd0, angle in Q11
+// abc to qd0, angle mapped to q16
 //------------------------------------------------------------------------------
-void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q11){
+void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q16){
     int32_t angle_m;
     int32_t angle_p;
-    angle_m = angle_q11 - MATH_DEG_TO_RAD(120, 11);
-    if (angle_m<0) angle_m += MATH_DEG_TO_RAD(360, 11);
-    angle_p = angle_q11 + MATH_DEG_TO_RAD(120, 11);
-    if (angle_p>=MATH_DEG_TO_RAD(360, 11)) angle_p -= MATH_DEG_TO_RAD(360, 11);
+    angle_m = angle_q16 - MATH_DEG_TO_Q16(120);
+    angle_p = angle_q16 + MATH_DEG_TO_Q16(120);
     // q = 2/3*(a*cos(ang) + b*cos(ang-120) + c*cos(ang+120))
-    abcqd0->q  = (abcqd0->a*math_cos(angle_q11))  >>14;
+    abcqd0->q  = (abcqd0->a*math_cos(angle_q16))  >>14;
     abcqd0->q += (abcqd0->b*math_cos(angle_m))>>14;
     abcqd0->q += (abcqd0->c*math_cos(angle_p))>>14;
     abcqd0->q  = (abcqd0->q*21845)>>15;
     // d = 2/3*(a*sin(ang) + b*sin(ang-120) + c*sin(ang+120))
-    abcqd0->d  = (abcqd0->a*math_sin(angle_q11))  >>14;
+    abcqd0->d  = (abcqd0->a*math_sin(angle_q16))  >>14;
     abcqd0->d += (abcqd0->b*math_sin(angle_m))>>14;
     abcqd0->d += (abcqd0->c*math_sin(angle_p))>>14;
     abcqd0->d  = (abcqd0->d*21845)>>15;
@@ -206,18 +194,16 @@ void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q11){
 }
 
 //------------------------------------------------------------------------------
-// qd0 to abc, angle in Q11 - NO RANGE CHECK (use macro)
+// qd0 to abc, angle mapped to q16
 //------------------------------------------------------------------------------
-void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q11){
+void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q16){
     int32_t angle_m;
     int32_t angle_p;
-    angle_m = angle_q11 - MATH_DEG_TO_RAD(120, 11);
-    if (angle_m<0) angle_m += MATH_DEG_TO_RAD(360, 11);
-    angle_p = angle_q11 + MATH_DEG_TO_RAD(120, 11);
-    if (angle_p>=MATH_DEG_TO_RAD(360, 11)) angle_p -= MATH_DEG_TO_RAD(360, 11);
+    angle_m = angle_q16 - MATH_DEG_TO_Q16(120);
+    angle_p = angle_q16 + MATH_DEG_TO_Q16(120);
     // a = q*cos(ang) + d*sin(ang) + zero
-    abcqd0->a  = (abcqd0->q*math_cos(angle_q11))>>14;
-    abcqd0->a += (abcqd0->d*math_sin(angle_q11))>>14;
+    abcqd0->a  = (abcqd0->q*math_cos(angle_q16))>>14;
+    abcqd0->a += (abcqd0->d*math_sin(angle_q16))>>14;
     abcqd0->a += abcqd0->zero;
     // b = q*cos(ang-120) + d*sin(ang-120) + zero
     abcqd0->b  = (abcqd0->q*math_cos(angle_m))>>14;

@@ -94,6 +94,7 @@ SRC = app.c \
 	pwm.c \
 	adc.c \
 	dac.c \
+	mathlib.c \
 	system_stm32f4xx.c \
 	stm32f4xx_gpio.c \
 	stm32f4xx_usart.c \

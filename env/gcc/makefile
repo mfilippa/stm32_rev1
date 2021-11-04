@@ -45,7 +45,8 @@ SRC = app.c \
 	pwm.c \
 	adc.c \
 	dac.c \
-	error.c
+	error.c \
+	mathlib.c
 
 # to execute under windows/linux
 ifdef OS

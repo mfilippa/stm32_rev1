@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// mathlib.h - MPF - 01/2017
+// mathlib.h - MPF - 11/2020
 // -----------------------------------------------------------------------------
 
 #ifndef _MATHLIB_H_
@@ -8,14 +8,26 @@
 // includes
 #include <stdint.h>
 
-// degrees to radians in Q format
-#define MATH_DEG_TO_RAD(deg, q)     \
-    ((int32_t)((double)deg/180.0*3.141592653589793*((int32_t)1<<q)))
+// MANY OF THESE FUNCTIONS DO NOT PERFORM RANGE CHECK, TRADE OFF FOR SPEED
+// RANGE CHECK BEFORE PASSING ARGUMENTS TO FUNCTION
+
+// angle representation:
+// [0..360) = [0..2pi) -> 0..0xFFFF (q16)
+
+// comment for fast sin/cos (table look up without interpolation)
+#define MATH_SIN_COS_INTERPOLATION
+
+// degrees to q16
+#define MATH_DEG_TO_Q16(deg)     \
+    ((uint32_t)(((int32_t)((double)deg/360.0*((int32_t)1<<16)))&0xFFFF))
+
+// radians to q16
+#define MATH_RAD_TO_Q16(deg)     \
+    ((uint32_t)(((int32_t)((double)deg/2.0/3.141592653589793* \
+        ((int32_t)1<<16)))&0xFFFF))
 
 // macro range check angle
-#define MATH_ANGLE_RANGE_CHECK(angle)\
-    while(angle>=MATH_DEG_TO_RAD(360, 11)) angle-= MATH_DEG_TO_RAD(360, 11); \
-    while(angle<0) angle += MATH_DEG_TO_RAD(360, 11);
+#define MATH_ANGLE_RANGE_CHECK(angle)   ((angle)&0xFFFF)
 
 // macro slew rate limiter
 #define MATH_SLR(var, target, step) \
@@ -43,13 +55,13 @@ typedef struct math_biquad_struct {
     int32_t b2;            // b2 coefficient in Q format
     int32_t a1;            // a1 coefficient in Q format
     int32_t a2;            // a2 coefficient in Q format
-    int32_t q;            // Q for filter coefficients
-    int32_t x_z1;        // memory location x(-1)
-    int32_t x_z2;        // memory location x(-2)
-    int32_t y_z1;        // memory location y(-1)
-    int32_t y_z2;        // memory location y(-2)
-    int32_t out;        // output of filter
-    int32_t fraction;    // for fraction saving
+    int32_t q;             // Q for filter coefficients
+    int32_t x_z1;          // memory location x(-1)
+    int32_t x_z2;          // memory location x(-2)
+    int32_t y_z1;          // memory location y(-1)
+    int32_t y_z2;          // memory location y(-2)
+    int32_t out;           // output of filter
+    int32_t fraction;      // for fraction saving
 } math_biquad_t;
 
 // table lookup struct
@@ -58,7 +70,7 @@ typedef struct math_tlookup_struct {
     int32_t x;            // x point
     int32_t y;            // y point
     int32_t slope;        // slope (y/x) in q format
-    int32_t slope_q;    // q coefficient of slope
+    int32_t slope_q;      // q coefficient of slope
 } math_tlookup_t;
 
 // abcqd0 structure
@@ -71,11 +83,11 @@ typedef struct math_abcqd0_struct{
     int32_t zero;
 } math_abcqd0_t;
 
-// sin: sin of angle in q11, returns value in q14
-int32_t math_sin(int32_t angle_q11);
+// sin: sin of angle mapped to q16, returns value in q14
+int32_t math_sin(int32_t angle_q16);
 
-// cos: cos of angle in q11, returns value in q14
-int32_t math_cos(int32_t angle_q11);
+// cos: cos of angle mapped to q16, returns value in q14
+int32_t math_cos(int32_t angle_q16);
 
 // table_lookup: look up table with interpolation/extrapolation, returns value
 // NOTE: TABLE MUST BE ORDERED ASCENDING WITH RESPECT TO X
@@ -90,10 +102,10 @@ void math_biquad_init(math_biquad_t * filter, int32_t b0, int32_t b1, int32_t b2
 // sqrt: square root of int
 int32_t math_sqrt(int32_t n);
 
-// abc_to_qd0: abc to qd0 transform, angle in q11
-void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q11);
+// abc_to_qd0: abc to qd0 transform, angle mapped to q16
+void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q16);
 
-// qd0_to_abc: qd0 to abc transform, angle in q11
-void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q11);
+// qd0_to_abc: qd0 to abc transform, angle mapped to q16
+void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q16);
 
 #endif // _MATHLIB_H_
