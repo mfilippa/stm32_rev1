@@ -21,13 +21,11 @@
 #define FREQ_FASTADC (20000u)  // fast adc in Hz
 #define FREQ_SLOWADC  (5000u)  // slow adc in Hz
 #define FREQ_SYSTICK  (1000u)  // systick in Hz
-#define FREQ_DATAOUT     (1u)  // systick in Hz
 
 // tick reload values - truncates to int, use fraction saving when truncating
 #define RELOAD_SYSTICK  (FREQ_MAIN/FREQ_SYSTICK)
 #define RELOAD_FASTADC  (FREQ_MAIN/FREQ_FASTADC)
 #define RELOAD_SLOWADC  (FREQ_MAIN/FREQ_SLOWADC)
-#define RELOAD_DATAOUT  (FREQ_MAIN/FREQ_DATAOUT)
 
 // time to ticks
 #define SIM_TIME_TO_TICKS(t)  ((uint64_t)((double)FREQ_MAIN*(double)(t)))
