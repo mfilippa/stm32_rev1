@@ -84,28 +84,34 @@ typedef struct math_abcqd0_struct{
 } math_abcqd0_t;
 
 // sin: sin of angle mapped to q16, returns value in q14
-int32_t math_sin(int32_t angle_q16);
+int32_t math_sin(uint32_t angle_q16);
 
 // cos: cos of angle mapped to q16, returns value in q14
-int32_t math_cos(int32_t angle_q16);
+int32_t math_cos(uint32_t angle_q16);
 
 // table_lookup: look up table with interpolation/extrapolation, returns value
 // NOTE: TABLE MUST BE ORDERED ASCENDING WITH RESPECT TO X
-int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, uint32_t tsize);
+int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, 
+    uint32_t tsize);
 
 // biquad_filter: implements a biquad filter
 int32_t math_biquad_filter(math_biquad_t * filter, int32_t input);
 
 // biquad_init: function to initialize filter
-void math_biquad_init(math_biquad_t * filter, int32_t b0, int32_t b1, int32_t b2, int32_t a1, int32_t a2, int32_t q);
+void math_biquad_init(math_biquad_t * filter, int32_t b0, int32_t b1, 
+    int32_t b2, int32_t a1, int32_t a2, int32_t q);
 
 // sqrt: square root of int
 int32_t math_sqrt(int32_t n);
 
 // abc_to_qd0: abc to qd0 transform, angle mapped to q16
-void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q16);
+void math_abc_to_qd0(math_abcqd0_t * abcqd0, uint32_t angle_q16);
 
 // qd0_to_abc: qd0 to abc transform, angle mapped to q16
-void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q16);
+void math_qd0_to_abc(math_abcqd0_t * abcqd0, uint32_t angle_q16);
+
+// step angle, angle mapped to q16
+void math_step_angle(uint32_t * angle_q16, uint32_t * angle_fraction, 
+    int32_t frequency, uint32_t frequency_q, int32_t deltaT, uint32_t deltaT_q);
 
 #endif // _MATHLIB_H_

@@ -12,7 +12,7 @@
 // -----------------------------------------------------------------------------
 // sin - angle mapped to q16, returns amplitude in Q14
 // -----------------------------------------------------------------------------
-int32_t math_sin(int32_t angle_q16){
+int32_t math_sin(uint32_t angle_q16){
 #ifdef MATH_SIN_COS_INTERPOLATION
     // with interpolation
     int32_t index, fract_q14, s1, s2;
@@ -33,7 +33,7 @@ int32_t math_sin(int32_t angle_q16){
 // -----------------------------------------------------------------------------
 // cos - angle mapped to q16, returns amplitude in Q14 
 // -----------------------------------------------------------------------------
-int32_t math_cos(int32_t angle_q16){
+int32_t math_cos(uint32_t angle_q16){
     angle_q16 += MATH_DEG_TO_Q16(90);
     return sine_table[MATH_ANGLE_RANGE_CHECK(angle_q16)
         >>(16-MATH_SINE_TABLE_SIZE_Q)];
@@ -42,7 +42,8 @@ int32_t math_cos(int32_t angle_q16){
 // -----------------------------------------------------------------------------
 // table look up
 // -----------------------------------------------------------------------------
-int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, uint32_t tsize){
+int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, 
+    uint32_t tsize){
     // NOTE: TABLE MUST BE ORDERED ASCENDING WITH RESPECT TO X
     uint32_t i;
     int32_t result = 0;
@@ -71,8 +72,8 @@ int32_t math_table_lookup(int32_t value, const math_tlookup_t * table, uint32_t 
 // -----------------------------------------------------------------------------
 // biquad filter init
 // -----------------------------------------------------------------------------
-void math_biquad_init(math_biquad_t * filter, int32_t b0, int32_t b1, int32_t b2,
-        int32_t a1, int32_t a2, int32_t q){
+void math_biquad_init(math_biquad_t * filter, int32_t b0, int32_t b1, 
+    int32_t b2, int32_t a1, int32_t a2, int32_t q){
     filter->a1 = a1;
     filter->a2 = a2;
     filter->b0 = b0;
@@ -174,7 +175,7 @@ int32_t math_atan2(int32_t y, int32_t x){
 //------------------------------------------------------------------------------
 // abc to qd0, angle mapped to q16
 //------------------------------------------------------------------------------
-void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q16){
+void math_abc_to_qd0(math_abcqd0_t * abcqd0, uint32_t angle_q16){
     int32_t angle_m;
     int32_t angle_p;
     angle_m = angle_q16 - MATH_DEG_TO_Q16(120);
@@ -196,7 +197,7 @@ void math_abc_to_qd0(math_abcqd0_t * abcqd0, int32_t angle_q16){
 //------------------------------------------------------------------------------
 // qd0 to abc, angle mapped to q16
 //------------------------------------------------------------------------------
-void math_qd0_to_abc(math_abcqd0_t * abcqd0, int32_t angle_q16){
+void math_qd0_to_abc(math_abcqd0_t * abcqd0, uint32_t angle_q16){
     int32_t angle_m;
     int32_t angle_p;
     angle_m = angle_q16 - MATH_DEG_TO_Q16(120);
@@ -231,6 +232,35 @@ math_tlookup_t math_exp_table[MATH_EXP_TSIZE] = {
         {13107,18231,19184,14},
         {14745,20149,21182,14},
 };
+int32_t math_fast_table_lookup(int32_t value, const math_tlookup_t * table,
+        uint32_t tsize){
+uint32_t index = (tsize * value)>>14;
+if (index>=tsize) return 0;
+return table[index].y + ((table[index].slope*(value-table[index].x))>>
+                table[index].slope_q);
+}
 int32_t math_exp(int32_t value){
     return math_fast_table_lookup(value, math_exp_table, MATH_EXP_TSIZE);
+}
+
+//------------------------------------------------------------------------------
+// step angle
+//------------------------------------------------------------------------------
+void math_step_angle(uint32_t * angle_q16, uint32_t * angle_fraction, 
+    int32_t frequency, uint32_t frequency_q, int32_t deltaT, uint32_t deltaT_q){
+    
+    int32_t temp, step_q14;
+
+    // calculates angle += 2 pi freq dt
+
+    // first calculate multiplication freq x dt, store in q14 to scale angle
+    temp = frequency*deltaT+*angle_fraction;
+    step_q14 = temp >>(frequency_q+deltaT_q-14);
+
+    // save fraction
+    *angle_fraction = temp - (step_q14<<(frequency_q+deltaT_q-14));
+
+    // finally add to angle
+    temp = (((1<<16)*step_q14)>>14);
+    *angle_q16 = MATH_ANGLE_RANGE_CHECK(*angle_q16+temp);
 }
