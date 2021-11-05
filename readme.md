@@ -15,7 +15,7 @@ Toolchains:
 
 # Known issues
 
-- stm32f1 not done yet. Rest of platforms are working.
+- stm32f1 not done or tested. Rest of platforms are working.
 
 # Architecture
 
