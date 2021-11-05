@@ -8,24 +8,26 @@ Cross platform project that supports:
 - Matlab simulation
 
 Toolchains:
+
 - /env/gcc_arm  - free, no limits
 - /env/gcc      - for linux/windows simulation, using gcc/mingw64
 - /env/matlab   - to simulate in matlab/simulink, using mingw64
 
-## Known issues
+# Known issues
+
 - stm32f1 not done yet. Rest of platforms are working.
 
 # Architecture
 
-/env        : contains all build files for all platforms: gcc, arm, matlab, etc
-  /gcc      : build files for windows/linux
-  /gcc_arm  : build files for arm
-  /matlab   : build files and model to run in matlab
-/ source    : source code
-  /app      : application (cross platform code)
-  /lib      : libraries (cross platform code)
-  /hal      : hardware abtraction layer (only .h files here)
-  /hil      : platform specific hardware implementation
+    /env        : contains all build files for all platforms: gcc, arm, matlab, etc
+      /gcc      : build files for windows/linux
+      /gcc_arm  : build files for arm
+      /matlab   : build files and model to run in matlab
+    / source    : source code
+      /app      : application (cross platform code)
+      /lib      : libraries (cross platform code)
+      /hal      : hardware abtraction layer (only .h files here)
+      /hil      : platform specific hardware implementation
 
 # Platform usage
 
@@ -39,24 +41,33 @@ How to set up:
 
 ## Arm gcc compiler
 
-*** Current issues ***
+### Current issues
+
 - stack is placed at top of RAM (per linker file), set RAM size correctly or micro will crash!
 - LTO works but must comment weak IRQ handlers in startup for every used IRQ. LTO seems to miss the weak definition and LTO replaces IRQ functions with loop. Possible bug in tool, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83967
 
-How to set up:
+### How to set up:
+
 - Get toolchain
-https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
+    https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
 - Extract all files, add to path
-  `tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2`
-export PATH=$PATH:/path/to/compiler
-  `export PATH=$PATH:~/gcc-arm-none-eabi-10.3-2021.10/bin`
 
-Another option is to add permanently to path. Add export cmd to either file that exists:
-~/.bashrc
-~/.bash_profile
+    `tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2`
+
+- export PATH=$PATH:/path/to/compiler
+
+    `export PATH=$PATH:~/gcc-arm-none-eabi-10.3-2021.10/bin`
+
+- Another option is to add permanently to path. Add export cmd to either file that exists:
+
+    ~/.bashrc
+    ~/.bash_profile
 
 
-Modifications:
+### Modifications:
+
 - ldscript:
   - pick target script (only diff is ROM and RAM origin and size)
 - startup:
@@ -70,16 +81,19 @@ Modifications:
   - update all files
 - compile
 
-Flashing:
+### Flashing:
+
 - Using STLink utility, set start to 0x0800000, flash binary (bin) and run
 
-Where files come from:
+### Where files come from:
+
 - From /share/gcc-arm-none-eabi/samples, extracted to project the following files:
   - ldscripts/*  - using nokeep.ld (minimum size binary)
   - startup/*
   - makefile
 
-Setting up the micro:
+### Setting up the micro:
+
 - Adjust HSE_VALUE definition in stm32f4xx.h and stm32f10x.h
 
 # Plotting results in C simulation
