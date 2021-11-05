@@ -47,9 +47,9 @@ How to set up:
 - Get toolchain
 https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 - Extract all files, add to path
-  > tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+  `tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2`
 export PATH=$PATH:/path/to/compiler
-  > export PATH=$PATH:~/gcc-arm-none-eabi-10.3-2021.10/bin
+  `export PATH=$PATH:~/gcc-arm-none-eabi-10.3-2021.10/bin`
 
 Another option is to add permanently to path. Add export cmd to either file that exists:
 ~/.bashrc
@@ -58,16 +58,16 @@ Another option is to add permanently to path. Add export cmd to either file that
 
 Modifications:
 - ldscript:
-  > pick target script (only diff is ROM and RAM origin and size)
+  - pick target script (only diff is ROM and RAM origin and size)
 - startup:
-  > pick correct startup file: M0. M3, M4, M7
-  > modify Stack_Size if needed
-  > check interrupts at __isr_vector and weak handler definitions (def_irq_handler) - see issue with LTO!
+  - pick correct startup file: M0. M3, M4, M7
+  - modify Stack_Size if needed
+  - check interrupts at __isr_vector and weak handler definitions (def_irq_handler) - see issue with LTO!
 - makefile:
-  > update ldscript
-  > update core
-  > set optimizer level and LTO
-  > update all files
+  - update ldscript
+  - update core
+  - set optimizer level and LTO
+  - update all files
 - compile
 
 Flashing:
@@ -75,9 +75,9 @@ Flashing:
 
 Where files come from:
 - From /share/gcc-arm-none-eabi/samples, extracted to project the following files:
-  > ldscripts/*  - using nokeep.ld (minimum size binary)
-  > startup/*
-  > makefile
+  - ldscripts/*  - using nokeep.ld (minimum size binary)
+  - startup/*
+  - makefile
 
 Setting up the micro:
 - Adjust HSE_VALUE definition in stm32f4xx.h and stm32f10x.h
