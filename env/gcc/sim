@@ -5,6 +5,7 @@ make
 if [ $? -eq 0 ]; then
 	./debug
 	gnuplot plotcmd.txt
+	display output.jpg
 else
 	echo "Make failed..."
 fi

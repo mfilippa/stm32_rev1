@@ -49,7 +49,12 @@ https://developer.arm.com/tools-and-software/open-source-software/developer-tool
 - Extract all files, add to path
   > tar -xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
 export PATH=$PATH:/path/to/compiler
-  > export PATH=$PATH:/home/user/gcc-arm-none-eabi-10.3-2021.10/bin
+  > export PATH=$PATH:~/gcc-arm-none-eabi-10.3-2021.10/bin
+
+Another option is to add permanently to path. Add export cmd to either file that exists:
+~/.bashrc
+~/.bash_profile
+
 
 Modifications:
 - ldscript:
@@ -82,3 +87,4 @@ Setting up the micro:
 - Install gnuplot (sudo apt install gnuplot)
 - run command '/env/gcc/gnuplot plotcmd.txt'
 - or run '/env/gcc/plot' script which will run make and gnuplot
+- plot will be shown via 'display' command or open jpg manually
