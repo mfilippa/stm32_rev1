@@ -26,6 +26,12 @@ struct {
     uint8_t tx_buffer[COMM_BUFFER_SIZE];
 } app;
 
+// simulation ports
+#ifdef SIMULATION
+extern const double pin[30];
+extern double pout[30];
+#endif
+
 // prototypes
 void app_led_blink(void);
 void app_comm_handler(uint32_t rx_size);

@@ -11,7 +11,7 @@ CFLAGS += -Wall
 # .. generate dependency files *.d
 CFLAGS += -MMD -MP
 # .. #define symbols
-CFLAGS += -DSYMBOL
+CFLAGS += -DSIMULATION
 # .. paths to search for header files
 CFLAGS += -I../../source/app
 CFLAGS += -I../../source/hal

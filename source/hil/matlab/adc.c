@@ -11,7 +11,7 @@ adc_data_t adc_data;
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-void adc_init(void (*slow_handler)(void), void (*fast_handler)(void)){ 
+void adc_init(void (*fast_handler)(void), void (*slow_handler)(void)){ 
     adc_data.fast_handler = fast_handler;
     adc_data.slow_handler = slow_handler;
     for (int i=0; i<ADC_FAST_COUNT; i++) adc_data.fast_raw[i] = 0;
