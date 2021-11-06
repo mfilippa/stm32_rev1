@@ -14,13 +14,13 @@ set title "LED"
 set autoscale
 plot [] [-0.5:1.5] "output.csv" using 1:2 with lines notitle lw 2
 
-# Debug1
-set title "DEBUG1"
+# --
+set title "--"
 set autoscale
 plot [] [] "output.csv" using 1:3 with lines notitle lw 2
 
-# Debug2
-set title "DEBUG2"
+# --
+set title "--"
 set autoscale
 plot [] [] "output.csv" using 1:4 with lines notitle lw 2
 
@@ -39,18 +39,18 @@ set title "--"
 set autoscale
 plot [] [] "output.csv" using 1:7 with lines notitle lw 2
 
-# --
-set title "--"
+# pout[27]
+set title "pout[27]"
 set autoscale
 plot [] [] "output.csv" using 1:8 with lines notitle lw 2
 
-# --
-set title "--"
+# pout[28]
+set title "pout[28]"
 set autoscale
 plot [] [] "output.csv" using 1:9 with lines notitle lw 2
 
-# --
-set title "--"
+# pout[29]
+set title "pout[29]"
 set autoscale
 plot [] [] "output.csv" using 1:10 with lines notitle lw 2
 

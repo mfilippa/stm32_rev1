@@ -123,14 +123,14 @@ int main(void) {
             fprintf(pfile,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,\n",
                 (double)tick.count/(double)FREQ_MAIN, 
                 (double) io_data.state[IO_CH_LED],
-                (double) io_data.state[IO_CH_DEBUG1],
-                (double) io_data.state[IO_CH_DEBUG2],
                 (double) 0,
                 (double) 0,
                 (double) 0,
                 (double) 0,
                 (double) 0,
-                (double) 0
+                (double) pout[27],
+                (double) pout[28],
+                (double) pout[29]
                 );
             tick.dataout = RELOAD_DATAOUT-1;
         }

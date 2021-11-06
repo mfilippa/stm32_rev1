@@ -13,6 +13,7 @@
 #include "adc.h"
 #include "dac.h"
 #include "macros.h"
+#include "ctrl.h"
 #include <string.h>
 
 // defines
@@ -109,14 +110,16 @@ void app_led_blink(void) {
 // fast ADC handler
 // -----------------------------------------------------------------------------
 void app_adc_fast_handler(void){
-    
+    // run control fast step
+    ctrl_fast_step();
 }
 
 // -----------------------------------------------------------------------------
 // slow ADC handler
 // -----------------------------------------------------------------------------
 void app_adc_slow_handler(void){
-    
+    // run control slow step
+    ctrl_slow_step();
 }
 
 // -----------------------------------------------------------------------------

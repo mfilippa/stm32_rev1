@@ -36,6 +36,7 @@ OBJDIR = ./obj
 
 # source files
 SRC = app.c \
+	ctrl.c\
 	sch.c \
 	comm.c \
 	main.c \
