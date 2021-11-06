@@ -9,7 +9,7 @@ Cross platform project that supports:
 
 Toolchains:
 
-- /env/gcc_arm  - free, no limits
+- /env/gcc_arm  - gcc for arm, free, no limits
 - /env/gcc      - for linux/windows simulation, using gcc/mingw64
 - /env/matlab   - to simulate in matlab/simulink, using mingw64
 
