@@ -1,31 +1,15 @@
 // -----------------------------------------------------------------------------
-// app.c - MPF 04/2020
+// app.c - Mariano F - 03/2024
 // -----------------------------------------------------------------------------
 
-// includes
+// private includes
 #include "app.h"
-#include "io.h"
-#include "sys.h"
-#include "uart.h"
-#include "sch.h"
 #include "comm.h"
-#include "pwm.h"
-#include "adc.h"
-#include "dac.h"
-#include "macros.h"
-#include "ctrl.h"
-#include <string.h>
+#include "io.h"
+#include "sch.h"
 
 // defines
-#define SYSTICK_FREQ_HZ     (1000)
-#define COMM_BUFFER_SIZE    (1000)
-
-// module structure
-struct {
-    // comm buffer
-    uint8_t rx_buffer[COMM_BUFFER_SIZE];
-    uint8_t tx_buffer[COMM_BUFFER_SIZE];
-} app;
+#define APP_LED_BLINK       (500u)  // led blink
 
 // simulation ports
 #ifdef SIMULATION
@@ -35,49 +19,19 @@ extern double pout[30];
 
 // prototypes
 void app_led_blink(void);
-void app_comm_handler(uint32_t rx_size);
-void app_systick(void);
-void app_adc_trigger(void);
-void app_dummy(void);
-void app_adc_fast_handler(void);
-void app_adc_slow_handler(void);
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
 void app_init(void) {
 
-    // disable all interrupts
-    sys_disable_interrupts();
-
-    // init systick
-    sys_tick_init(SYSTICK_FREQ_HZ, &app_systick);
-
-    // init peripherals
-    io_init();
-    uart_init(UART_COMM,UART_BAUD_115200);
-
-    // init scheduler
+    // init scheduler - initialize this before any other module
+    // some modules might rely on an initialized scheduler
     sch_init();
     sch_function_register(&app_led_blink,500);
 
-    // init comm
-    comm_init(UART_COMM, COMM_BUFFER_SIZE, app.rx_buffer, app.tx_buffer, 
-        &app_comm_handler, 100);
-
-    // init pwm
-    pwm_init(10000,0, 0);  // freq, deadtime, fault handler
-    pwm_enable();
-
-    // init adc
-    adc_init(&app_adc_fast_handler,
-        &app_adc_slow_handler);     // fast handler, slow handler
-
-    // init dac
-    dac_init(DAC_TRIGGER_SW);
-
-    // enable interrupts
-    sys_enable_interrupts();
+    // initialize comm
+    comm_init();
 
 }
 
@@ -85,17 +39,17 @@ void app_init(void) {
 // background
 // -----------------------------------------------------------------------------
 void app_background(void) {
-    // comm step
-    comm_step();
     // run scheduled tasks
     sch_step();
+    // run communications
+    comm_step();
 }
 
 // -----------------------------------------------------------------------------
-// systick
+// scheduler tick
 // -----------------------------------------------------------------------------
-void app_systick(void) {
-    // scheduler tick
+void app_tick(void){
+    // run scheduler tick only
     sch_tick();
 }
 
@@ -107,78 +61,29 @@ void app_led_blink(void) {
 }
 
 // -----------------------------------------------------------------------------
-// fast ADC handler
-// -----------------------------------------------------------------------------
-void app_adc_fast_handler(void){
-    // run control fast step
-    ctrl_fast_step();
-}
-
-// -----------------------------------------------------------------------------
-// slow ADC handler
-// -----------------------------------------------------------------------------
-void app_adc_slow_handler(void){
-    // run control slow step
-    ctrl_slow_step();
-}
-
-// -----------------------------------------------------------------------------
-// dummy
-// -----------------------------------------------------------------------------
-void app_dummy(void){
-
-}
-
-// -----------------------------------------------------------------------------
 // comm handler
 // -----------------------------------------------------------------------------
+const char * const fw_version = APP_FW_VERSION;
 void app_comm_handler(uint32_t rx_size) {
-
-    uint32_t cmd, temp;
 
     // first byte is cmd, echo it
     cmd = comm_read8();
     comm_write8(cmd);
 
-    // comm machine
-    switch (cmd) {
-
-    case 0x00:
-        // echo
-        for (temp = 1; temp < rx_size; temp++) {
+    // commands
+    switch(cmd){
+    case (0x00):    // echo
+        for (uint32_t tmp = 1; tmp < rx_size; tmp++) {
             comm_write8(comm_read8());
         }
         break;
-    case 0x01:
-        break;
-    case 0x02:
-        break;
-    case 0x03:
-        break;
-    case 0x04:
-        break;
-    case 0x05:
-        break;
-    case 0x06:
-        break;
-    case 0x07:
-        break;
-    case 0xD0:
-        for (int32_t i=0;i<ADC_FAST_COUNT;i++) 
-            comm_write16(adc_read_fast((adc_fast_channel_t)i));
-        for (int32_t i=0;i<ADC_SLOW_COUNT;i++) 
-            comm_write16(adc_read_slow((adc_slow_channel_t)i));
-        break;
-        break;
-    case 0xD1:
-        break;
-    case 0xD2:
-        break;
-    case 0xD3:
+    case (0x01):    // fw version and other status/faults
+        // firmware version always last (variable string length)
+        comm_writestr(fw_version);
         break;
     default:
         // command not recognized
-        comm_write8(0xFF);
+        comm_write8(COMM_INVALID_CMD);
     }
 }
 

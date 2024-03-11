@@ -1,15 +1,18 @@
 // -----------------------------------------------------------------------------
-// sch.h - MPF 11/2019
+// sch.h - Mariano F - 04/2024
 // -----------------------------------------------------------------------------
-
 
 #ifndef _SCH_H_
 #define _SCH_H_
 
-// includes
+// public includes
 #include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
+#include <bool.h>
+#include <string.h>
+
+//------------------------------------------------------------------------------
+// public structures and definitions
+//------------------------------------------------------------------------------
 
 // definitions
 #define SCH_NR_TIMERS    64        // max number of timers
@@ -21,19 +24,20 @@ typedef void (sch_function_t)(void);
 // function handle
 typedef uint32_t sch_handle_t;
 
-// init: initializes module
+//------------------------------------------------------------------------------
+// public prototypes
+//------------------------------------------------------------------------------
+
+// init
 void sch_init(void);
 
-// tick: run this at systick, it generates a list of functions to be
-// executed by sch_step()
+// tick: run this at sys timer, it schedules functions to run by sch_step()
 void sch_tick(void);
 
-// step: run this at background, it will execute scheduled functions when their
-// time expires
+// step: run this at background
 void sch_step(void);
 
-// function_register: register a function to be scheduled, reload in ticks
-// returns the task handle
+// register a function to be scheduled, reload in ticks. Returns the task handle
 // a NULL function pointer disables the function
 sch_handle_t sch_function_register(sch_function_t * function, uint32_t reload);
 

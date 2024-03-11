@@ -2,26 +2,25 @@
 
 Cross platform project that supports:
 
-- STM32F415R8T6 (custom board)
-- STM32F103C8T6 (blue pill)
-- Windows/Linux simulation
+- STM32 Cortex M3/M4
+- Code simulation in linux/windows
 - Matlab simulation
 
 Toolchains:
 
-- /env/gcc_arm  - gcc for arm, free, no limits
-- /env/gcc      - for linux/windows simulation, using gcc/mingw64
-- /env/matlab   - to simulate in matlab/simulink, using mingw64
+- /env/gcc_arm  - gcc for embedded arm
+- /env/gcc      - gcc for linux/windows simulation
+- /env/matlab   - to simulate in matlab/simulink
 
 # Known issues
 
-- stm32f1 not done or tested. Rest of platforms are working.
+- Reworking the whole thing... this will be broken for a while
 
 # Architecture
 
-    /env        : contains all build files for all platforms: gcc, arm, matlab, etc
-      /gcc      : build files for windows/linux
-      /gcc_arm  : build files for arm
+    /env        : contains all build files for all platforms
+      /gcc      : build files to run on windows/linux
+      /gcc_arm  : build files for embedded arm
       /matlab   : build files and model to run in matlab
     / source    : source code
       /app      : application (cross platform code)
@@ -39,7 +38,7 @@ How to set up:
 - update makefile
 - make and run
 
-## Arm gcc compiler
+## arm gcc compiler
 
 ### Current issues
 

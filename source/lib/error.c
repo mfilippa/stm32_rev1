@@ -1,28 +1,27 @@
 // -----------------------------------------------------------------------------
-// error.c - MPF 11/2019
+// error.c - Mariano F - 04/2024
 // -----------------------------------------------------------------------------
 
-// includes
-#include <string.h>
+// private includes
 #include "error.h"
 
 // module struct
 struct error_struct {
     error_t error;
-    void (*err_handler)(error_t err);
+    error_handler_t * handler;
 } error;
 
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-void error_init(void (*err_handler)(error_t err)){
-    error.err_handler = err_handler;
+void error_init(error_handler_t * handler){
+    error.handler = handler;
 }
 
 // -----------------------------------------------------------------------------
-// prototypes
+// raise error
 // -----------------------------------------------------------------------------
 void error_raise(error_t err){
-    if (error.err_handler!=NULL) (*error.err_handler)(err);
+    if (error.handler!=NULL) (*error.handler)(err);
 }

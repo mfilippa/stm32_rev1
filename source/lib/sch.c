@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------------------
-// sch.c - MPF 11/2019
+// sch.c - Mariano F - 04/2024
 // -----------------------------------------------------------------------------
 
-// includes
-#include "error.h"
+// private includes
 #include "sch.h"
+#include "error.h"
 
 // function table struct
 typedef struct sch_table_struct {
@@ -55,7 +55,9 @@ void sch_tick(void){
     }
     // search for non-zero timers, decrement its count
     for (i=0; i<sch.timer_count; i++){
-        if (sch.timer[i] != 0) sch.timer[i]--;
+        if (sch.timer[i] != 0) {
+            sch.timer[i]--;
+        }
     }
 }
 
@@ -80,7 +82,9 @@ void sch_step(void){
 // register function
 // -----------------------------------------------------------------------------
 sch_handle_t sch_function_register(sch_function_t * function, uint32_t reload){
-    if (sch.function_count == SCH_NR_FUNCTIONS) error_raise(ERROR_SCH_REG);
+    if (sch.function_count == SCH_NR_FUNCTIONS) {
+        error_raise(ERROR_SCH);
+    }
     sch.function[sch.function_count].function = function;
     sch.function[sch.function_count].reload = reload;
     sch.function_count++;
@@ -92,17 +96,24 @@ sch_handle_t sch_function_register(sch_function_t * function, uint32_t reload){
 // set reload
 // -----------------------------------------------------------------------------
 void sch_function_set_reload(sch_handle_t handle, uint32_t reload){
-    if (handle>sch.function_count) error_raise(ERROR_SCH_ARG);
-    else if (handle==0) error_raise(ERROR_SCH_ARG);
-    else sch.function[handle-1].reload = reload;
+    if ((handle>sch.function_count)||(handle==0)) {
+        error_raise(ERROR_SCH);
+    }
+    else {
+        sch.function[handle-1].reload = reload;
+    }
 }
 
 // -----------------------------------------------------------------------------
 // set function - set to NULL to disable it
 // -----------------------------------------------------------------------------
 void sch_function_set(sch_handle_t handle, void (*function)(void)){
-    if (handle>sch.function_count) error_raise(ERROR_SCH_ARG);
-    else sch.function[handle-1].function = function;
+    if (handle>sch.function_count) {
+        error_raise(ERROR_SCH);
+    }
+    else {
+        sch.function[handle-1].function = function;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -110,7 +121,9 @@ void sch_function_set(sch_handle_t handle, void (*function)(void)){
 // -----------------------------------------------------------------------------
 sch_handle_t sch_timer_register(void){
     // check if max nr of timer has been reached
-    if (sch.timer_count == SCH_NR_TIMERS) error_raise(ERROR_SCH_REG);
+    if (sch.timer_count == SCH_NR_TIMERS) {
+        error_raise(ERROR_SCH);
+    }
     // else create timer and return handle
     sch.timer_count++;
     return sch.timer_count;
@@ -121,8 +134,9 @@ sch_handle_t sch_timer_register(void){
 // set timer
 // -----------------------------------------------------------------------------
 void sch_timer_set(sch_handle_t handle, uint32_t count){
-    if (handle>sch.timer_count) error_raise(ERROR_SCH_ARG);
-    else if (handle==0) error_raise(ERROR_SCH_ARG);
+    if ((handle>sch.timer_count)||(handle==0)) {
+        error_raise(ERROR_SCH);
+    }
     sch.timer[handle-1]= count;
 }
 
@@ -130,8 +144,9 @@ void sch_timer_set(sch_handle_t handle, uint32_t count){
 // check if expired - return 1 if expired
 // -----------------------------------------------------------------------------
 bool sch_timer_has_expired(sch_handle_t handle){
-    if (handle>sch.timer_count) error_raise(ERROR_SCH_ARG);
-    else if (handle==0) error_raise(ERROR_SCH_ARG);
+    if ((handle>sch.timer_count)||(handle==0)) {
+        error_raise(ERROR_SCH);
+    }
     if (sch.timer[handle-1]==0) return true;
     else return false;
 }

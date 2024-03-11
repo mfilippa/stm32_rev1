@@ -1,22 +1,35 @@
 // -----------------------------------------------------------------------------
-// app.h - MPF 04/2020
+// app.h - Mariano F - 03/2024
 // -----------------------------------------------------------------------------
 
 #ifndef _APP_H_
 #define _APP_H_
 
-// includes
+// public includes
 #include <stdint.h>
 #include <stdio.h>
 
+//------------------------------------------------------------------------------
+// public structures and definitions
+//------------------------------------------------------------------------------
 
-// init: initializes application
+// public defines
+#define APP_FW_VERSION    "v0.0.0"
+
+//------------------------------------------------------------------------------
+// public prototypes
+//------------------------------------------------------------------------------
+
+// init
 void app_init(void);
 
-// background: background step
+// background step
 void app_background(void);
 
-// systick: to be executed at system timer tick event
-void app_systick(void);
+// scheduler tick
+void app_tick(void);
+
+// comm handler
+void app_comm_handler(uint32_t rx_size);
 
 #endif // _APP_H_

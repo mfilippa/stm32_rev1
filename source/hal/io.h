@@ -1,17 +1,20 @@
 // -----------------------------------------------------------------------------
-// io.h - MPF 10/2021
+// io.h - Mariano F - 03/2024
 // -----------------------------------------------------------------------------
 
 #ifndef _IO_H_
 #define _IO_H_
 
-// includes
+// public includes
 #include <stdint.h>
-#include <stdio.h>
 
-// io channels - do not use physical ifaces, use hw abstracted names
+//------------------------------------------------------------------------------
+// public structures and definitions
+//------------------------------------------------------------------------------
+
+// io channels
 typedef enum io_channel_enum {
-    IO_CH_LED = 0,           // LED
+    IO_CH_LED,               // LED
     IO_CH_DEBUG1,            // DEBUG1
     IO_CH_DEBUG2,            // DEBUG2
     IO_CH_COUNT,
@@ -23,27 +26,26 @@ typedef enum io_states_enum {
     IO_STATE_SET,
 } io_state_t;
 
-// *** for simulation environment only ***
-// io data
-typedef struct io_data_struct {
-    io_state_t state[IO_CH_COUNT];
-} io_data_t;
-extern io_data_t io_data;
-// *** end simulation environment data ***
+//------------------------------------------------------------------------------
+// public prototypes
+//------------------------------------------------------------------------------
 
-// init: initializes module
+// init
 void io_init(void);
 
-// set: sets channel
+// set channel
 void io_set(io_ch_t channel);
 
-// reset: resets channel
+// reset channel
 void io_reset(io_ch_t channel);
 
-// toggle: toggles channel
+// toggle channel
 io_state_t io_toggle(io_ch_t channel);
 
-// read: reads channel
+// read channel
 io_state_t io_read(io_ch_t channel);
+
+// comm handler
+void io_comm_handler(uint32_t rx_size);
 
 #endif // _IO_H_

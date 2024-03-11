@@ -1,45 +1,39 @@
 // -----------------------------------------------------------------------------
-// dac.h - MPF 10/2021
+// dac.h - Mariano F - 04/2023
 // -----------------------------------------------------------------------------
 
 #ifndef _DAC_H_
 #define _DAC_H_
 
-// includes
+// public includes
 #include <stdint.h>
 #include <stdio.h>
 
+//------------------------------------------------------------------------------
+// public structures and definitions
+//------------------------------------------------------------------------------
+
 // dac channels
-typedef enum dac_channel_enum {
+typedef enum dac_ch_enum {
     DAC_CH1 = 0,
     DAC_CH2,
     DAC_CH_COUNT,
 } dac_ch_t;
 
-// trigger
-typedef enum dac_trigger_enum {
-    DAC_TRIGGER_NONE = 0,   // DAC values loaded immediately
-    DAC_TRIGGER_PWM,        // DAC values loaded by PWM trigger
-    DAC_TRIGGER_SW,         // DAC values loaded by SW trigger
-    DAC_TRIGGER_COUNT
-} dac_trigger_t;
+//------------------------------------------------------------------------------
+// public prototypes
+//------------------------------------------------------------------------------
 
-// *** for simulation environment only ***
-// dac data
-typedef struct dac_data_struct {
-    int32_t dac_ch1_value;  // 0..2^16-1
-    int32_t dac_ch2_value;  // 0..2^16-1
-} dac_data_t;
-extern dac_data_t dac_data;
-// *** end simulation environment data ***
+// init
+void dac_init(void);
 
-// init: initializes module
-void dac_init(dac_trigger_t trigger);
+// set a channel
+void dac_set(dac_ch_t channel, float value);
 
-// set: sets channel, value = 0..2^16-1
-void dac_set(dac_ch_t channel, int32_t value);
+// trigger a dac out
+void dac_trigger(void);
 
-// software trigger
-void dac_sw_trigger(void);
+// comm handler
+void dac_comm_handler(uint32_t rx_size);
 
 #endif // _DAC_H_
