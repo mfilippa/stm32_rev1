@@ -17,7 +17,7 @@ typedef enum adc_ch_enum {
     ADC_CH1,
     ADC_CH2,
     ADC_CH3,
-    MODULE_ENUM_COUNT,
+    ADC_CH_COUNT,
 } adc_ch_t;
 
 //------------------------------------------------------------------------------

@@ -67,7 +67,7 @@ const char * const fw_version = APP_FW_VERSION;
 void app_comm_handler(uint32_t rx_size) {
 
     // first byte is cmd, echo it
-    cmd = comm_read8();
+    uint32_t cmd = comm_read8();
     comm_write8(cmd);
 
     // commands

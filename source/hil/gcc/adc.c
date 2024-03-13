@@ -5,35 +5,33 @@
 // includes
 #include "adc.h"
 
-// adc data
-adc_data_t adc_data;
+// internal variables
+uint32_t adc_raw[ADC_CH_COUNT];
 
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-void adc_init(void (*fast_handler)(void), void (*slow_handler)(void)){ 
-    adc_data.fast_handler = fast_handler;
-    adc_data.slow_handler = slow_handler;
-    for (int i=0; i<ADC_FAST_COUNT; i++) adc_data.fast_raw[i] = 0;
-    for (int i=0; i<ADC_SLOW_COUNT; i++) adc_data.slow_raw[i] = 0;
+void adc_init(void){ 
+
 }
 
 // -----------------------------------------------------------------------------
 // sw trigger
 // -----------------------------------------------------------------------------
-void adc_sw_trigger_fast(void) {
-    // nothing to do
-}
-void adc_sw_trigger_slow(void) {
-    // nothing to do
+void adc_trigger(void){
+
 }
 
 // -----------------------------------------------------------------------------
 // ADC read
 // -----------------------------------------------------------------------------
-uint32_t adc_read_fast(uint32_t channel) {
-    return adc_data.fast_raw[channel];
+uint32_t adc_read(uint32_t channel) {
+    return (channel<ADC_CH_COUNT) ? adc_raw[channel] : UINT32_MAX;
 }
-uint32_t adc_read_slow(uint32_t channel) {
-    return adc_data.slow_raw[channel];
+
+// -----------------------------------------------------------------------------
+// comm handler
+// -----------------------------------------------------------------------------
+void adc_comm_handler(uint32_t rx_size){
+
 }

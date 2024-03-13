@@ -36,7 +36,6 @@ OBJDIR = ./obj
 
 # source files
 SRC = app.c \
-	ctrl.c\
 	sch.c \
 	comm.c \
 	main.c \
@@ -47,7 +46,9 @@ SRC = app.c \
 	adc.c \
 	dac.c \
 	error.c \
-	mathlib.c
+	mathlib.c \
+	dac.c \
+	i2c.c 
 
 # to execute under windows/linux
 ifdef OS

@@ -15,6 +15,7 @@
 #include "dac.h"
 #include "pwm.h"
 #include "sys.h"
+#include "i2c.h"
 
 // comm state machine states
 typedef enum comm_state_enum {
@@ -69,7 +70,7 @@ void comm_init(void){
     comm.state = COMM_STATE_IDLE;
     // get a timer handle
     comm.sch_timer_handle = sch_timer_register();
-    if(comm.sch_timer_handle==0) { error_raise(ERROR_COMM_INIT); }
+    if(comm.sch_timer_handle==0) { error_raise(ERROR_COMM); }
 }
 
 // -----------------------------------------------------------------------------

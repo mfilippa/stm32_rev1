@@ -7,6 +7,7 @@
 
 // public includes
 #include <stdint.h>
+#include <stdbool.h>
 
 //------------------------------------------------------------------------------
 // public structures and definitions

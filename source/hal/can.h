@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-// module.h - author - date
+// can.h - Mariano F - 03/2024
 //------------------------------------------------------------------------------
 
-#ifndef _MODULE_H_
-#define _MODULE_H_
+#ifndef _CAN_H_
+#define _CAN_H_
 
 // public includes
 #include <stdint.h>
-#include <bool.h>
+#include <stdbool.h>
 #include <string.h>
 
 //------------------------------------------------------------------------------
@@ -15,70 +15,70 @@
 //------------------------------------------------------------------------------
 
 // public defines
-#define MODULE_DEFINE1    (1.0f)
-#define MODULE_DEFINE2    (2.0f)
+#define CAN_DEFINE1    (1.0f)
+#define CAN_DEFINE2    (2.0f)
 
 // public default params
-#define MODULE_DEF_PARAM1  (1.0F)
-#define MODULE_DEF_PARAM2  (1.5F)
-#define MODULE_DEF_PARAM3  (2.3F)
+#define CAN_DEF_PARAM1  (1.0F)
+#define CAN_DEF_PARAM2  (1.5F)
+#define CAN_DEF_PARAM3  (2.3F)
 
 // module enumerations
-typedef enum module_enum {
-    MODULE_ENUM1,
-    MODULE_ENUM2,
-    MODULE_ENUM3,
-    MODULE_ENUM_COUNT,
-} module_enum_t;
+typedef enum can_enum {
+    CAN_ENUM1,
+    CAN_ENUM2,
+    CAN_ENUM3,
+    CAN_ENUM_COUNT,
+} can_enum_t;
 
 // public parameter list
-typedef enum module_parameter_enum {
-    MODULE_PARAM1,          // parameter 1
-    MODULE_PARAM2,          // parameter 2
-    MODULE_PARAM3,          // parameter 3
-    MODULE_PARAM_COUNT,
-} module_param_t;
+typedef enum can_parameter_enum {
+    CAN_PARAM1,          // parameter 1
+    CAN_PARAM2,          // parameter 2
+    CAN_PARAM3,          // parameter 3
+    CAN_PARAM_COUNT,
+} can_param_t;
 
 // public public param struct typedef
-typedef struct module_params_struct {
+typedef struct can_params_struct {
     float param1;
     float param2;
     float param3;
-} module_param_table_t;
+} can_param_table_t;
 
 // public public module out struct typedef
-typedef struct module_out_struct{
+typedef struct can_out_struct{
     float out1;
     float out2;
     float out3;
-} module_out_table_t;
+} can_out_table_t;
 
 //------------------------------------------------------------------------------
 // public prototypes
 //------------------------------------------------------------------------------
 
 // init
-void module_init(void);
+void can_init(void);
 
 // step
-void module_step(void);
+void can_step(void);
 
 // get out struct
-module_out_t * module_get_out_struct(void);
+can_out_t * can_get_out_struct(void);
 
 // get param struct
-module_param_table_t * module_get_param_table(void);
+can_param_table_t * can_get_param_table(void);
 
 // set param
 // XXX params can be float or ints but this function passes float only
 // should work but will result in extra type conversion and possible
 // incorrect data due to float > int conversion. This needs fixing...
-void module_set_param(module_param_t param, float value);
+void can_set_param(can_param_t param, float value);
 
 // load params
-void module_load_param(void);
+void can_load_param(void);
 
 // comm handler
-void module_comm_handler(uint32_t rx_size);
+void can_comm_handler(uint32_t rx_size);
 
-#endif  // _MODULE_H_
+#endif  // _CAN_H_

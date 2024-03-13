@@ -7,7 +7,7 @@
 
 // public includes
 #include <stdint.h>
-#include <bool.h>
+#include <stdbool.h>
 #include <string.h>
 
 //------------------------------------------------------------------------------

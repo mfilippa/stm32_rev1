@@ -5,31 +5,35 @@
 // includes
 #include "dac.h"
 
-// dac data
-dac_data_t dac_data;
+// internal data
+float dac_value[DAC_CH_COUNT];
 
 // -----------------------------------------------------------------------------
 // initialize
 // -----------------------------------------------------------------------------
-void dac_init(dac_trigger_t trigger){
-    // do nothing
+void dac_init(void){
+    
 }
 
 // -----------------------------------------------------------------------------
 // set
 // -----------------------------------------------------------------------------
-void dac_set(dac_ch_t channel, int32_t value){
-    // no error checking for speed
-    // expected value range 0..2^16-1
-    if (channel==DAC_CH1) 
-        dac_data.dac_ch1_value = value;
-    if (channel==DAC_CH2) 
-        dac_data.dac_ch2_value = value;
+void dac_set(dac_ch_t channel, float value){
+    if (channel<DAC_CH_COUNT) {
+        dac_value[channel] = value;
+    }
 }
 
 // -----------------------------------------------------------------------------
 // software trigger
 // -----------------------------------------------------------------------------
-void dac_sw_trigger(void){
-    // do nothing
+void dac_trigger(void){
+
+}
+
+// -----------------------------------------------------------------------------
+// comm handler
+// -----------------------------------------------------------------------------
+void dac_comm_handler(uint32_t rx_size){
+    
 }
