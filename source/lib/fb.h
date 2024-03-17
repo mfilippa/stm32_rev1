@@ -1,46 +1,59 @@
 // -----------------------------------------------------------------------------
-// fb.h - MPF 01/2017
+// fb.h - Mariano F - 03/2024
 // -----------------------------------------------------------------------------
 
 #ifndef _FB_H_
 #define _FB_H_
 
-// includes
+// public includes
 #include <stdint.h>
+#include <float.h>
+#include <stdbool.h>
+
+//------------------------------------------------------------------------------
+// public structures and definitions
+//------------------------------------------------------------------------------
 
 // fb table
 typedef struct fb_table_struct {
-    int32_t raw;                // raw ADC value
-    int32_t offset;                // raw ADC offset
-    int32_t scaling;            // scaling
-    int32_t scaling_q;            // q factor for scaling
-    int32_t value;                // converted value
-    int32_t min;                // min value to check against
-    int32_t max;                // max value to check against
-    int32_t out_of_range;        // out of range flag if value exceeds max/min
+    float offset;             // raw ADC offset
+    float scaling;            // scaling
+    float value;              // converted value
+    float min;                // min value to check against
+    float max;                // max value to check against
 } fb_table_t;
 
-// init: initializes module, returns 0
-uint32_t fb_init(fb_table_t * fb_table, uint32_t tsize);
+// feedback channels
+typedef enum fb_channel_enum {
+    FB_CH1,
+    FB_CH2,
+    FB_CH3,
+    FB_CH4,
+    FB_CH_COUNT,
+} fb_ch_t;
 
-// store_params: store processing parameters
-void fb_store_params(uint32_t channel, int32_t scaling, int32_t scaling_q,
-        int32_t min, int32_t max);
+//------------------------------------------------------------------------------
+// public prototypes
+//------------------------------------------------------------------------------
 
-// get_raw: gets raw ADC value
-uint32_t fb_get_raw(uint32_t channel);
-
-// store_offset: store offset, if any. Use fb_get_raw() to calculate
-// an offset to store
-void fb_store_offset(uint32_t channel, uint32_t raw);
+// init
+void fb_init(void);
 
 // process: calculate final value based on offset and scaling
-void fb_process(uint32_t channel, int32_t raw);
+void fb_process(fb_ch_t channel, uint32_t raw);
 
 // get: get final value
-int32_t fb_get(uint32_t channel);
+float fb_get(fb_ch_t channel);
 
-// check: check if value is out of range (max/min), return 1 if so, 0 if not.
-uint32_t fb_range_check(uint32_t channel);
+// range check: check if value is out of range (max/min)
+bool fb_out_of_range_min_max(fb_ch_t channel);
+bool fb_out_of_range_min(fb_ch_t channel);
+bool fb_out_of_range_max(fb_ch_t channel);
+
+// store_offset
+void fb_store_offset(fb_ch_t channel, float offset);
+
+// comm handler
+void fb_comm_handler(uint32_t rx_size);
 
 #endif // _FB_H_

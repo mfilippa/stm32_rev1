@@ -7,6 +7,7 @@
 #include "comm.h"
 #include "io.h"
 #include "sch.h"
+#include "fb.h"
 
 // defines
 #define APP_LED_BLINK       (500u)  // led blink
@@ -32,6 +33,9 @@ void app_init(void) {
 
     // initialize comm
     comm_init();
+
+    // initialize feedbacks
+    fb_init();
 
 }
 

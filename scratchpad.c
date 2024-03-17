@@ -26,10 +26,9 @@
 
 
 // modules that need work
-debug
-fb
-fsm
-macros
-mathlib
-param
-sm
+// debug
+// fsm
+// macros
+// mathlib
+// param
+// sm

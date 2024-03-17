@@ -8,6 +8,9 @@ CC = gcc
 # compiler flags:
 # .. all warnings
 CFLAGS += -Wall
+CFLAGS += -Wundef
+# .. ignore unknown pragmas
+CFLAGS += -Wno-unknown-pragmas
 # .. generate dependency files *.d
 CFLAGS += -MMD -MP
 # .. #define symbols
@@ -27,6 +30,7 @@ VPATH += ../../source/hil/gcc
 # LDFLAGS += -L./
 # .. libraries to link
 # LIBS += -llib
+LIBS += -lm
 
 # executable name
 EXEC = debug
@@ -48,7 +52,8 @@ SRC = app.c \
 	error.c \
 	mathlib.c \
 	dac.c \
-	i2c.c 
+	i2c.c \
+	fb.c
 
 # to execute under windows/linux
 ifdef OS
